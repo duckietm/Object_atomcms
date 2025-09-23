@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Miscellaneous;
 
+use Exception;
 use App\Exceptions\MigrationFailedException;
 use App\Http\Controllers\Controller;
 use App\Models\Miscellaneous\WebsiteInstallation;
@@ -106,7 +107,7 @@ class InstallationController extends Controller
             3 => $settingsData[2] ?? [],
             4 => $settingsData[3] ?? [],
             5 => [], // Completion step has no settings
-            default => throw new \Exception('Step does not exist'),
+            default => throw new Exception('Step does not exist'),
         };
 
         return WebsiteSetting::query()

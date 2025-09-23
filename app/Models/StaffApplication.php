@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Game\Permission;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -22,6 +23,6 @@ class StaffApplication extends Model
 
     public function rank(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Game\Permission::class, 'rank_id');
+        return $this->belongsTo(Permission::class, 'rank_id');
     }
 }

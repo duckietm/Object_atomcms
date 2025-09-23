@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\User\UserResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Actions\SendCurrency;
 use App\Enums\CurrencyTypes;
 use App\Models\Game\Player\UserCurrency;
@@ -23,7 +24,7 @@ class EditUser extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Atom\CameraWebResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Resources\Atom\CameraWebResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,7 +14,7 @@ class EditCameraWeb extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

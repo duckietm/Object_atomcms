@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Hotel\OpenPositionResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\Hotel\OpenPositionResource;
 use Filament\Resources\Pages\ListRecords;
 
@@ -12,7 +13,7 @@ class ListOpenPositions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

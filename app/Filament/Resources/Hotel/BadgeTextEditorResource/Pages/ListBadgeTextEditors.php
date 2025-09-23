@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Hotel\BadgeTextEditorResource\Pages;
 
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
 use App\Filament\Resources\Hotel\BadgeTextEditorResource;
 use App\Models\WebsiteBadge;
 use App\Services\SettingsService;
@@ -17,7 +19,7 @@ class ListBadgeTextEditors extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make()
+            CreateAction::make()
                 ->label('Add Badge')
 				        ->color('info')
                 ->modalHeading('Add a New Badge')
@@ -29,10 +31,10 @@ class ListBadgeTextEditors extends ListRecords
                         ->success()
                         ->send();
                 }),
-            Actions\Action::make('export')
+            Action::make('export')
                 ->label('Export to JSON')
                 ->action('exportToJson'),
-            Actions\Action::make('backup')
+            Action::make('backup')
                 ->label('Create Backup')
                 ->color('success')
                 ->action('createBackup'),

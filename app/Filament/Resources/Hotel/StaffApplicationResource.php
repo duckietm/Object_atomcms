@@ -2,10 +2,18 @@
 
 namespace App\Filament\Resources\Hotel;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Hotel\StaffApplicationResource\Pages\ListStaffApplications;
+use App\Filament\Resources\Hotel\StaffApplicationResource\Pages\EditStaffApplication;
 use App\Filament\Resources\Hotel\StaffApplicationResource\Pages;
 use App\Models\StaffApplication;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,28 +22,28 @@ class StaffApplicationResource extends Resource
 {
     protected static ?string $model = StaffApplication::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationGroup = 'Hotel';
+    protected static string | \UnitEnum | null $navigationGroup = 'Hotel';
 	
 	public static function canCreate(): bool
     {
         return false;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('user_id')
+        return $schema
+            ->components([
+                Select::make('user_id')
                     ->relationship('user', 'username')
                     ->required()
                     ->searchable(),
-                Forms\Components\Select::make('rank_id')
+                Select::make('rank_id')
                     ->relationship('rank', 'rank_name')
                     ->required()
                     ->searchable(),
-                Forms\Components\Textarea::make('content')
+                Textarea::make('content')
                     ->required()
                     ->columnSpanFull(),
             ]);
@@ -45,41 +53,41 @@ class StaffApplicationResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.username')
+                TextColumn::make('user.username')
                     ->label('User')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('rank.rank_name')
+                TextColumn::make('rank.rank_name')
                     ->label('Rank')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('content')
+                TextColumn::make('content')
                     ->limit(50)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 // Add filters if needed
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStaffApplications::route('/'),
-            'edit' => Pages\EditStaffApplication::route('/{record}/edit'),
+            'index' => ListStaffApplications::route('/'),
+            'edit' => EditStaffApplication::route('/{record}/edit'),
         ];
     }
 }

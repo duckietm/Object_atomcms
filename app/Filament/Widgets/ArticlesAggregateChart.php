@@ -12,9 +12,9 @@ class ArticlesAggregateChart extends ChartWidget
 {
     protected static ?int $sort = 2;
 
-    protected static ?string $maxHeight = '300px';
+    protected ?string $maxHeight = '300px';
 
-    protected static string $color = 'primary';
+    protected string $color = 'primary';
 
     public function getHeading(): string|Htmlable|null
     {

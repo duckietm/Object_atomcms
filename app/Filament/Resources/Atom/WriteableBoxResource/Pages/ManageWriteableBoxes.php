@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Atom\WriteableBoxResource\Pages;
 
+use Filament\Actions\CreateAction;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 use App\Filament\Resources\Atom\WriteableBoxResource;
@@ -13,7 +14,7 @@ class ManageWriteableBoxes extends ManageRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

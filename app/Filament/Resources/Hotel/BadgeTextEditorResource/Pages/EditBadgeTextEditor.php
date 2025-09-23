@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Hotel\BadgeTextEditorResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Resources\Hotel\BadgeTextEditorResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -16,7 +17,7 @@ class EditBadgeTextEditor extends EditRecord
 
     protected function getActions(): array
     {
-        return [Actions\DeleteAction::make()];
+        return [DeleteAction::make()];
     }
 
     protected function mutateFormDataBeforeSave(array $data): array

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Foundation\Vite;
+use App\Services\ViteService;
 use App\Exceptions\MigrationFailedException;
 use App\Services\PermissionsService;
 use App\Services\RconService;
@@ -23,8 +25,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            \Illuminate\Foundation\Vite::class,
-            \App\Services\ViteService::class
+            Vite::class,
+            ViteService::class
         );
 
         $this->app->singleton(

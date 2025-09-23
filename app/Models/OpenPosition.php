@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Game\Permission;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -34,7 +35,7 @@ class OpenPosition extends Model
 
     public function permission()
     {
-        return $this->belongsTo(\App\Models\Game\Permission::class, 'permission_id', 'id');
+        return $this->belongsTo(Permission::class, 'permission_id', 'id');
     }
 
     public function applications()

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use App\Models\WebsiteBadge;
 use App\Services\SettingsService;
@@ -34,7 +35,7 @@ class ImportBadgeData extends Command
         try {
             $this->processBadgeData($jsonPath);
             $this->info('Badge data imported successfully.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to import badge data: ' . $e->getMessage());
             $this->error('Failed to import badge data. Check the logs for details.');
         }
