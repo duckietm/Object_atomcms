@@ -186,7 +186,7 @@ class ArticleResource extends Resource
                 ->state(fn ($record) => is_null($record->deleted_at))
                 ->disabled(),
 
-            ToggleColumn::make('allow_comments')
+            ToggleColumn::make('can_comment')
                 ->label(__('filament::resources.columns.allow_comments'))
                 ->onIcon('heroicon-s-check')
                 ->toggleable()
