@@ -220,6 +220,7 @@
     "A new verification link has been sent to the email address you provided during registration.": "En verifikasjons link er blitt sendt til emailen du oppga under registrering.",
     "Resend Verification Email": "Send verifikasjons emailen på ny",
     "Log Out": "Logg Ut",
+	"Application Deadline :date": "Application Deadline :date",
     "You have already applied for :position": "Du har allerede søkt på :position",
     "Apply for :position": "Søk på :position",
     "No positions open": "Ingen ledige stillinger",
