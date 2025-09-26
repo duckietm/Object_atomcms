@@ -246,6 +246,7 @@
     "A new verification link has been sent to the email address you provided during registration.": "En ny verifieringslänk har skickats till den e-postadress du angav vid registreringen.",
     "Resend Verification Email": "Skicka verifieringsemail igen",
     "Log Out": "Logga ut",
+	"Application Deadline :date": "Application Deadline :date",
     "You have already applied for :position": "Du har redan ansökt om :position",
     "Apply for :position": "Ansöka om :position",
     "About you": "Om dig",
