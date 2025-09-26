@@ -3,6 +3,7 @@
 use App\Actions\Fortify\Controllers\TwoFactorAuthenticatedSessionController;
 use App\Http\Controllers\Articles\ArticleController;
 use App\Http\Controllers\Articles\WebsiteArticleCommentsController;
+use App\Http\Controllers\Badge\BadgeController;
 use App\Http\Controllers\Client\FlashController;
 use App\Http\Controllers\Client\NitroController;
 use App\Http\Controllers\Community\LeaderboardController;
@@ -102,6 +103,10 @@ Route::middleware(['maintenance', 'check.ban', 'force.staff.2fa'])->group(functi
 				Route::delete('/user/settings/two-factor-authentication', [TwoFactorAuthenticationController::class, 'destroy'])->name('user.two-factor.disable');
             });
         });
+		
+		// Drawbadge
+		Route::get('/draw-badge', [BadgeController::class, 'show'])->name('draw-badge');
+		Route::post('/buy-badge', [BadgeController::class, 'buy'])->name('badge.buy');
 
         // Profiles
         Route::get('/profile/{user:username}', ProfileController::class)->name('profile.show');
