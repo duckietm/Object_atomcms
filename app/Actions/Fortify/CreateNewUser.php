@@ -28,7 +28,7 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input)
     {
-        if (setting('disable_registration')) {
+        if ((setting('disable_registration') ?: '0') == '1') {
             throw ValidationException::withMessages([
                 'registration' => __('Registration is disabled.'),
             ]);
@@ -46,7 +46,7 @@ class CreateNewUser implements CreatesNewUsers
             ->orWhere('ip_register', '=', $ip)
             ->count();
 
-        if ($matchingIpCount >= (int) setting('max_accounts_per_ip')) {
+        if ($matchingIpCount >= (int) (setting('max_accounts_per_ip') ?: 99)) {
             throw ValidationException::withMessages([
                 'registration' => __('You have reached the max amount of allowed account'),
             ]);
@@ -60,13 +60,13 @@ class CreateNewUser implements CreatesNewUsers
             'password' => Hash::make($input['password']),
             'account_created' => time(),
             'last_login' => time(),
-            'motto' => setting('start_motto'),
-            'look' => setting('start_look'),
-            'credits' => setting('start_credits'),
+            'motto' => setting('start_motto') ?: 'Welcome to the hotel!',
+            'look' => setting('start_look') ?: 'hr-100-61.hd-180-1.ch-210-66.lg-270-110.sh-305-62',
+            'credits' => setting('start_credits') ?: 1000,
             'ip_register' => $ip,
             'ip_current' => $ip,
             'auth_ticket' => '',
-            'home_room' => (int) setting('hotel_home_room'),
+            'home_room' => (int) (setting('hotel_home_room') ?: 0),
         ]);
 
         $user->update([
@@ -114,7 +114,7 @@ class CreateNewUser implements CreatesNewUsers
     private function validate(array $inputs): array
     {
         $rules = [
-            'username' => ['required', 'string', sprintf('regex:%s', setting('username_regex')), 'max:25', Rule::unique('users'), new WebsiteWordfilterRule],
+            'username' => ['required', 'string', sprintf('regex:%s', setting('username_regex') ?: '/^[a-zA-Z0-9_.-]+$/'), 'max:25', Rule::unique('users'), new WebsiteWordfilterRule],
             'mail' => ['required', 'string', 'email', 'max:255', Rule::unique('users')],
             'password' => $this->passwordRules(),
             'beta_code' => ['sometimes', 'string', new BetaCodeRule],

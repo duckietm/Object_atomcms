@@ -15,8 +15,8 @@ class UserFactory extends Factory
             'password' => Hash::make('password'),
             'account_created' => time(),
             'last_login' => time(),
-            'look' => setting('start_look'),
-            'credits' => setting('start_credits'),
+            'look' => setting('start_look') ?: 'hr-100-61.hd-180-1.ch-210-66.lg-270-110.sh-305-62',
+            'credits' => setting('start_credits') ?: 1000,
             'ip_register' => '127.0.0.1',
             'ip_current' => '127.0.0.1',
         ];

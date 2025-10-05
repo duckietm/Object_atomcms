@@ -11,13 +11,6 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication, RefreshDatabase;
 
-    protected string $seeder = TestingSeeder::class;
-
-    protected function shouldSeed()
-    {
-        return true;
-    }
-
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabase::$migrated) {
@@ -25,10 +18,10 @@ abstract class TestCase extends BaseTestCase
             $this->createTestDatabase();
             
             // Run migrations (including CoreSqlFile migration)
-            $this->artisan('migrate:fresh', [
-                '--seed' => $this->shouldSeed(),
-                '--seeder' => $this->seeder,
-            ]);
+            $this->artisan('migrate:fresh');
+            
+            // Force TestingSeeder to run
+            $this->artisan('db:seed', ['--class' => TestingSeeder::class]);
 
             RefreshDatabase::$migrated = true;
         }
