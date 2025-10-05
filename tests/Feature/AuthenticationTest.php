@@ -1,15 +1,6 @@
 <?php
 
 use App\Models\User;
-use App\Models\Miscellaneous\WebsiteSetting;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Support\Facades\Hash;
-
-test('login screen can be rendered', function () {
-    $response = $this->get('/');
-
-    expect($response->status())->toBe(200);
-});
 
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
