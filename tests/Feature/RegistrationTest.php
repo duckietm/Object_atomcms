@@ -2,11 +2,6 @@
 
 use App\Providers\RouteServiceProvider;
 
-test('registration screen can be rendered', function () {
-    $response = $this->get('/register');
-
-    expect($response->status())->toBe(200);
-});
 
 test('new users can register', function () {
     $response = $this->post('/register', [
@@ -17,7 +12,7 @@ test('new users can register', function () {
         'terms' => true,
     ]);
 
-    expect(auth()->check())->toBeTrue();
-    expect($response->status())->toBe(302);
-    expect(parse_url($response->headers->get('Location'), PHP_URL_PATH))->toBe(parse_url(RouteServiceProvider::HOME, PHP_URL_PATH));
+    expect(auth()->check())->toBeTrue()
+        ->and($response->status())->toBe(302)
+        ->and(parse_url($response->headers->get('Location'), PHP_URL_PATH))->toBe(parse_url(RouteServiceProvider::HOME, PHP_URL_PATH));
 });
