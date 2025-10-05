@@ -49,7 +49,6 @@ $this->updateExternalTexts(true, $badgeCode, $websiteDrawBadge->badge_name, $web
         $filePath = DB::table('website_settings')->where('key', 'nitro_external_texts_file')->value('value');
 
         if (!$filePath || !file_exists($filePath) || !is_writable($filePath)) {
-            // Optionally log error
             return;
         }
 
