@@ -95,7 +95,7 @@ class WebsiteDrawBadgeResource extends Resource
                     ->before(function (DeleteAction $action, WebsiteDrawBadge $record) {
                         $badgeCode = pathinfo($record->badge_path, PATHINFO_FILENAME);
 
-                        // Unpublish if published
+                        // Remove the badge from any user before deleting it.
                         if ($record->published) {
                             DB::table('users_badges')
                                 ->where('user_id', $record->user_id)
