@@ -116,7 +116,7 @@ class WebsiteDrawBadgeResource extends Resource
                         // Delete the badge file from the filesystem
                         $badgePath = $record->badge_path;
                         if ($badgePath && file_exists($badgePath)) {
-                            unlink($badgePath); // Remove the file
+                            unlink($badgePath);
                         }
                     }),
             ])
