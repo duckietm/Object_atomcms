@@ -13,7 +13,7 @@ abstract class TestCase extends BaseTestCase
 
     protected string $seeder = TestingSeeder::class;
 
-    protected function shouldSeed(): bool
+    protected function shouldSeed()
     {
         return true;
     }
