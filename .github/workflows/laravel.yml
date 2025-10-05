@@ -9,6 +9,16 @@
     jobs:
       tests:
         runs-on: ubuntu-latest
+        
+        services:
+          mariadb:
+            image: mariadb:11
+            env:
+              MYSQL_ALLOW_EMPTY_PASSWORD: yes
+              MYSQL_DATABASE: atomcms_testing
+            ports:
+              - 3306:3306
+            options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
 
         steps:
         - uses: actions/checkout@v4
@@ -41,8 +51,12 @@
         - name: Prepare Laravel Application
           run: |
             cp .env.example .env
-            touch database/testing.sqlite
             php artisan key:generate
+            
+        - name: Setup Database Schema
+          run: |
+            mysql -h127.0.0.1 -uroot atomcms_testing < database/migrations/sql/arcturus-3-5-3-database.sql
+            php artisan migrate --force
 
         - name: Run Test suite
           run: php artisan test

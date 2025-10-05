@@ -1,16 +1,15 @@
 <?php
 
 use App\Providers\RouteServiceProvider;
-use function Pest\Laravel\{assertAuthenticated, get, post};
 
 test('registration screen can be rendered', function () {
-    $response = get('/register');
+    $response = $this->get('/register');
 
-    $response->assertStatus(200);
+    expect($response->status())->toBe(200);
 });
 
 test('new users can register', function () {
-    $response = post('/register', [
+    $response = $this->post('/register', [
         'username' => 'Test_User',
         'mail' => 'test@example.com',
         'password' => 'password',
@@ -18,6 +17,7 @@ test('new users can register', function () {
         'terms' => true,
     ]);
 
-    assertAuthenticated();
-    $response->assertRedirect(RouteServiceProvider::HOME);
+    expect(auth()->check())->toBeTrue();
+    expect($response->status())->toBe(302);
+    expect(parse_url($response->headers->get('Location'), PHP_URL_PATH))->toBe(parse_url(RouteServiceProvider::HOME, PHP_URL_PATH));
 });

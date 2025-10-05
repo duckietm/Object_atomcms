@@ -2,18 +2,9 @@
 
 namespace App\Actions\Fortify;
 
-use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 
 class RedirectIfTwoFactorConfirmed extends RedirectIfTwoFactorAuthenticatable
 {
-    public function handle($request, $next)
-    {
-        $user = $this->validateCredentials($request);
-
-        if ($user?->two_factor_confirmed && in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
-            return $this->twoFactorChallengeResponse($request, $user);
-        }
-
-        return $next($request);
-    }
+    // This class can use the default behavior from the parent class
 }

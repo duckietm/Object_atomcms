@@ -19,7 +19,7 @@ class RconService
     {
         $this->config = [
             'ip' => setting('rcon_ip'),
-            'port' => setting('rcon_port'),
+            'port' => (int)setting('rcon_port'),
         ];
 
         $this->initialize();

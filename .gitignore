@@ -10,6 +10,7 @@
 /public/static
 .env
 .env.backup
+.env.testing
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -21,3 +22,4 @@ yarn.lock
 /.vscode
 /public/assets/images/generated-logos
 CLAUDE.md
+.phpunit.cache

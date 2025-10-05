@@ -62,6 +62,11 @@ class User extends Authenticatable implements FilamentUser, HasName
         ];
     }
 
+    public function getAuthIdentifierName(): string
+    {
+        return 'username';
+    }
+
     public function currencies(): HasMany
     {
         return $this->hasMany(UserCurrency::class, 'user_id');
