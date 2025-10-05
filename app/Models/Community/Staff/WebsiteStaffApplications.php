@@ -10,8 +10,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class WebsiteStaffApplications extends Model
 {
     protected $guarded = ['id'];
-
-    public function rank(): BelongsTo
+	protected $table = 'website_staff_applications';
+    
+    protected $fillable = [
+        'user_id',
+        'rank_id',
+        'content',
+    ];
+	
+	public function rank(): BelongsTo
     {
         return $this->belongsTo(Permission::class, 'rank_id');
     }
