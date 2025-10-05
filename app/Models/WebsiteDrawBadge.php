@@ -8,14 +8,7 @@ class WebsiteDrawBadge extends Model
 {
     protected $table = 'website_drawbadges';
 
-    protected $fillable = [
-        'user_id',
-        'badge_path',
-        'badge_url',
-        'badge_name',
-        'badge_desc',
-        'published',
-    ];
+    protected $guarded = ['id'];
 	
 	public function user()
     {
