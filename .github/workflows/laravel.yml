@@ -51,6 +51,10 @@
         - name: Prepare Laravel Application
           run: |
             cp .env.testing.example .env.testing
+            # Override database config for GitHub Actions
+            sed -i 's/DB_USERNAME=docker/DB_USERNAME=root/' .env.testing
+            sed -i 's/DB_PASSWORD=password/DB_PASSWORD=/' .env.testing
+            sed -i 's/DB_DATABASE=testing/DB_DATABASE=atomcms_testing/' .env.testing
             php artisan key:generate --env=testing
             
         - name: Setup Database Schema
