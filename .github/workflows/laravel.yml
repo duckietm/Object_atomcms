@@ -60,6 +60,23 @@
         - name: Setup Database Schema
           run: |
             php artisan migrate --force --env=testing
+            php artisan db:seed --env=testing --class=TestingSeeder --force
 
-        - name: Run Test suite
-          run: php artisan test --env=testing
+        - name: Debug Laravel Configuration
+          run: |
+            php artisan config:cache --env=testing
+            php artisan route:cache --env=testing
+            php artisan view:cache --env=testing
+            
+        - name: Create storage directories
+          run: |
+            mkdir -p storage/app/public
+            mkdir -p storage/framework/cache
+            mkdir -p storage/framework/sessions
+            mkdir -p storage/framework/views
+            mkdir -p storage/logs
+            chmod -R 755 storage
+            
+        - name: Run Test suite with debug
+          run: |
+            php artisan test --env=testing --stop-on-failure
