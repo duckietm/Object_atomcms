@@ -9,35 +9,39 @@ class WebsiteDrawBadgeObserver
 {
     public function updated(WebsiteDrawBadge $websiteDrawBadge): void
     {
-        if ($websiteDrawBadge->wasChanged('published')) {
-            $badgeCode = pathinfo($websiteDrawBadge->badge_path, PATHINFO_FILENAME);
+        if (!$websiteDrawBadge->wasChanged() || !$websiteDrawBadge->badge_path) {
+    return;
+}
 
-            if ($websiteDrawBadge->published) {
-                $exists = DB::table('users_badges')
-                    ->where('user_id', $websiteDrawBadge->user_id)
-                    ->where('badge_code', $badgeCode)
-                    ->exists();
+$badgeCode = pathinfo($websiteDrawBadge->badge_path, PATHINFO_FILENAME);
 
-                if (!$exists) {
-                    DB::table('users_badges')->insert([
-                        'user_id' => $websiteDrawBadge->user_id,
-                        'slot_id' => 0,
-                        'badge_code' => $badgeCode,
-                    ]);
-                }
+if (!$websiteDrawBadge->published) {
+    DB::table('users_badges')
+        ->where('user_id', $websiteDrawBadge->user_id)
+        ->where('badge_code', $badgeCode)
+        ->delete();
 
-                // Add to JSON
-                $this->updateExternalTexts(true, $badgeCode, $websiteDrawBadge->badge_name, $websiteDrawBadge->badge_desc);
-            } else {
-                DB::table('users_badges')
-                    ->where('user_id', $websiteDrawBadge->user_id)
-                    ->where('badge_code', $badgeCode)
-                    ->delete();
+    // Remove from JSON
+    $this->updateExternalTexts(false, $badgeCode);
+    
+    return;
+}
 
-                // Remove from JSON
-                $this->updateExternalTexts(false, $badgeCode);
-            }
-        }
+$exists = DB::table('users_badges')
+    ->where('user_id', $websiteDrawBadge->user_id)
+    ->where('badge_code', $badgeCode)
+    ->exists();
+
+if (!$exists) {
+    DB::table('users_badges')->insert([
+        'user_id' => $websiteDrawBadge->user_id,
+        'slot_id' => 0,
+        'badge_code' => $badgeCode,
+    ]);
+}
+
+// Add to JSON
+$this->updateExternalTexts(true, $badgeCode, $websiteDrawBadge->badge_name, $websiteDrawBadge->badge_desc);
     }
 
     protected function updateExternalTexts(bool $add, string $badgeCode, ?string $name = null, ?string $desc = null): void
