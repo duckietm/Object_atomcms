@@ -126,6 +126,7 @@ class WebsiteDrawBadgeResource extends Resource
                         foreach ($records as $record) {
                             $badgeCode = pathinfo($record->badge_path, PATHINFO_FILENAME);
 
+                            // Remove the badge from any user before deleting it.
                             if ($record->published) {
                                 DB::table('users_badges')
                                     ->where('user_id', $record->user_id)
