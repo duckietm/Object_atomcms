@@ -57,11 +57,6 @@
             sed -i 's/DB_DATABASE=testing/DB_DATABASE=atomcms_testing/' .env.testing
             php artisan key:generate --env=testing
             
-        - name: Setup Database Schema
-          run: |
-            php artisan migrate --force --env=testing
-            php artisan db:seed --env=testing --class=TestingSeeder --force
-
         - name: Debug Laravel Configuration
           run: |
             php artisan config:cache --env=testing
