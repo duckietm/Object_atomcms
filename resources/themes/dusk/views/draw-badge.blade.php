@@ -33,19 +33,19 @@
                 <div class="flex flex-col gap-6">
                     <div class="flex flex-col gap-2">
                         <div class="flex flex-col md:flex-row flex-wrap gap-4 justify-between">
-                            <button @click="toggleCopyMode" :aria-pressed="copyMode" aria-label="{{ __('Toggle copy color mode') }}" class="flex items-center justify-center font-medium gap-2 flex-1 border-2 border-black rounded badge-drawer-button text-black">
+                            <button @click="toggleCopyMode" :aria-pressed="copyMode" aria-label="{{ __('Toggle copy color mode') }}" class="flex items-center justify-center font-medium gap-2 flex-1 border-2 border-black rounded badge-drawer-button text-black dark:text-white">
                                 {{ __('Copy color:') }}
                                 <i class="fa-solid fa-eye-dropper"></i>
                             </button>
-                            <button @click="toggleEraseMode" :aria-pressed="eraseMode" aria-label="{{ __('Toggle erase mode') }}" class="flex items-center justify-center font-medium gap-2 flex-1 border-2 border-black rounded badge-drawer-button text-black">
+                            <button @click="toggleEraseMode" :aria-pressed="eraseMode" aria-label="{{ __('Toggle erase mode') }}" class="flex items-center justify-center font-medium gap-2 flex-1 border-2 border-black rounded badge-drawer-button text-black dark:text-white">
                                 {{ __('Erase mode:') }}
                                 <i class="fa-solid fa-eraser"></i>
                             </button>
-                            <button  @click="$refs.fileInput.click()" aria-label="{{ __('Import a picture for your badge') }}" class="flex items-center justify-center font-medium gap-2 flex-1 border-2 border-black rounded badge-drawer-button text-black">
+                            <button  @click="$refs.fileInput.click()" aria-label="{{ __('Import a picture for your badge') }}" class="flex items-center justify-center font-medium gap-2 flex-1 border-2 border-black rounded badge-drawer-button text-black dark:text-white">
                                 {{ __('Import Picture:') }}
                                 <i class="fa-solid fa-file-import"></i>
                             </button>
-                            <button  @click="showGrid = !showGrid" :aria-pressed="showGrid" aria-label="{{ __('Toggle grid visibility') }}" class="flex items-center justify-center font-medium gap-2 flex-1 border-2 border-black rounded badge-drawer-button text-black">
+                            <button  @click="showGrid = !showGrid" :aria-pressed="showGrid" aria-label="{{ __('Toggle grid visibility') }}" class="flex items-center justify-center font-medium gap-2 flex-1 border-2 border-black rounded badge-drawer-button text-black dark:text-white">
                                 {{ __('Show Grid:') }}    
                                 <i class="fa-solid fa-table-cells"></i>
                             </button>
