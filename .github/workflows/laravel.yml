@@ -50,13 +50,12 @@
 
         - name: Prepare Laravel Application
           run: |
-            cp .env.example .env
-            php artisan key:generate
+            cp .env.testing.example .env.testing
+            php artisan key:generate --env=testing
             
         - name: Setup Database Schema
           run: |
-            mysql -h127.0.0.1 -uroot atomcms_testing < database/migrations/sql/arcturus-3-5-3-database.sql
-            php artisan migrate --force
+            php artisan migrate --force --env=testing
 
         - name: Run Test suite
-          run: php artisan test
+          run: php artisan test --env=testing
