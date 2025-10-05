@@ -13,6 +13,11 @@ abstract class TestCase extends BaseTestCase
 
     protected string $seeder = TestingSeeder::class;
 
+    protected function shouldSeed(): bool
+    {
+        return true;
+    }
+
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabase::$migrated) {
