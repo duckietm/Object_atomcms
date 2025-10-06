@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\WebsiteAdResource\Pages;
+namespace App\Filament\Resources\Hotel\WebsiteAds\Pages;
 
-use App\Filament\Resources\Hotel\WebsiteAdResource;
+use App\Filament\Resources\Hotel\WebsiteAds\WebsiteAdResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

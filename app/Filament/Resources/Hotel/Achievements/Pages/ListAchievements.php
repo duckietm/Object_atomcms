@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\AchievementResource\Pages;
+namespace App\Filament\Resources\Hotel\Achievements\Pages;
 
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Traits\LatestResourcesTrait;
-use App\Filament\Resources\Hotel\AchievementResource;
+use App\Filament\Resources\Hotel\Achievements\AchievementResource;
 
 class ListAchievements extends ListRecords
 {

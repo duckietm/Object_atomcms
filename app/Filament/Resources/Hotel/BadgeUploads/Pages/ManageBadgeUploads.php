@@ -1,20 +1,23 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\BadgeUploadResource\Pages;
+namespace App\Filament\Resources\Hotel\BadgeUploads\Pages;
 
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Pages\Page;
 use Filament\Forms;
 use Filament\Notifications\Notification; // Import the Notification class
 use Illuminate\Support\Facades\Storage;
 
-class ManageBadgeUploads extends Page implements Forms\Contracts\HasForms
+class ManageBadgeUploads extends Page implements HasForms
 {
-    use Forms\Concerns\InteractsWithForms;
+    use InteractsWithForms;
 
     public $badge_file;
 
-    protected static string $resource = 'App\Filament\Resources\Hotel\BadgeUploadResource';
-    protected static string $view = 'filament.pages.manage-badge-uploads';
+    protected static string $resource = 'App\Filament\Resources\Hotel\BadgeUploads\BadgeUploadResource';
+    protected string $view = 'filament.pages.manage-badge-uploads';
 
     public function mount(): void
     {
@@ -24,7 +27,7 @@ class ManageBadgeUploads extends Page implements Forms\Contracts\HasForms
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\FileUpload::make('badge_file')
+            FileUpload::make('badge_file')
                 ->label('Upload Badge')
                 ->disk('badges')
                 ->preserveFilenames()

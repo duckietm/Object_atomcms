@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Atom\TagResource\Pages;
+namespace App\Filament\Resources\Atom\Tags\Pages;
 
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\Atom\TagResource;
+use App\Filament\Resources\Atom\Tags\TagResource;
 
 class CreateTag extends CreateRecord
 {

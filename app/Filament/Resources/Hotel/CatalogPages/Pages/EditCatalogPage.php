@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\CatalogPageResource\Pages;
+namespace App\Filament\Resources\Hotel\CatalogPages\Pages;
 
-use App\Filament\Resources\Hotel\CatalogPageResource;
+use App\Filament\Resources\Hotel\CatalogPages\CatalogPageResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 

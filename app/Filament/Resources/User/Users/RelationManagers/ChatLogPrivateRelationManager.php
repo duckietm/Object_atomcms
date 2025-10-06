@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\User\UserResource\RelationManagers;
+namespace App\Filament\Resources\User\Users\RelationManagers;
 
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use App\Filament\Resources\Hotel\ChatlogPrivateResource;
+use App\Filament\Resources\Hotel\ChatlogPrivates\ChatlogPrivateResource;
 use Filament\Resources\RelationManagers\RelationManager;
 
 class ChatLogPrivateRelationManager extends RelationManager
@@ -13,9 +13,9 @@ class ChatLogPrivateRelationManager extends RelationManager
 
     protected static $targetResource = ChatlogPrivateResource::class;
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
     public function table(Table $table): Table

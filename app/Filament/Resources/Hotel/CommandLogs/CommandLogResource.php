@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel;
+namespace App\Filament\Resources\Hotel\CommandLogs;
 
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
+use App\Filament\Resources\Hotel\CommandLogs\Pages\ManageCommandLogs;
 use App\Models\CommandLog;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -17,17 +18,17 @@ class CommandLogResource extends Resource
 
     protected static ?string $model = CommandLog::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
-    protected static ?string $navigationGroup = 'Logs';
+    protected static string | \UnitEnum | null $navigationGroup = 'Logs';
 
     public static string $translateIdentifier = 'command-logs';
 
     protected static ?string $slug = 'logs/commands';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([]);
+        return $schema->components([]);
     }
 
     public static function table(Table $table): Table
@@ -65,14 +66,14 @@ class CommandLogResource extends Resource
                         'no' => __('filament::resources.options.no'),
                     ]),
             ])
-            ->actions([])
-            ->bulkActions([]);
+            ->recordActions([])
+            ->toolbarActions([]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageCommandLogs::route('/'),
+            'index' => ManageCommandLogs::route('/'),
         ];
     }
 }

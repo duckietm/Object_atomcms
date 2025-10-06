@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Throwable;
 use App\Models\Miscellaneous\WebsitePermission;
 use App\Models\Miscellaneous\WebsiteSetting;
 use Illuminate\Support\Collection;
@@ -20,7 +21,7 @@ class SettingsService
             });
 
             $this->settings = Cache::get('website_settings');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->settings = collect();
         }
     }

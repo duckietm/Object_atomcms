@@ -1,19 +1,26 @@
 <?php
 
-namespace App\Filament\Resources\Atom;
+namespace App\Filament\Resources\Atom\Permissions;
 
+use Filament\Pages\Enums\SubNavigationPosition;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Str;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use App\Filament\Resources\Atom\Permissions\Pages\ListPermissions;
+use App\Filament\Resources\Atom\Permissions\Pages\CreatePermission;
+use App\Filament\Resources\Atom\Permissions\Pages\ViewPermission;
+use App\Filament\Resources\Atom\Permissions\Pages\EditPermission;
 use App\Models\Game\Permission;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
@@ -24,7 +31,6 @@ use App\Filament\Traits\TranslatableResource;
 use App\Filament\Tables\Columns\HabboBadgeColumn;
 use App\Filament\Resources\Atom\PermissionResource\Pages;
 use Filament\Pages\Page;
-use Filament\Pages\SubNavigationPosition;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
 
@@ -34,9 +40,9 @@ class PermissionResource extends Resource
 
     protected static ?string $model = Permission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?string $navigationGroup = 'Website';
+    protected static string | \UnitEnum | null $navigationGroup = 'Website';
 
     protected static ?string $slug = 'website/permissions';
 
@@ -44,9 +50,9 @@ class PermissionResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'rank_name';
 
-    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+    protected static ?\Filament\Pages\Enums\SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    public static function form(Form $form): Form
+    public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
         /**
          * @param string $name
@@ -75,8 +81,8 @@ class PermissionResource extends Resource
             ->colors(['0' => 'danger', '1' => 'success'])
             ->grouped();
 
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Tabs::make('Main')
                     ->tabs([
                         Tab::make(__('filament::resources.tabs.General Information'))
@@ -207,7 +213,7 @@ class PermissionResource extends Resource
 
                 TextColumn::make('rank_name')
                     ->label(__('filament::resources.columns.name'))
-                    ->description(fn (Model $record) => \Str::limit($record->description, 40))
+                    ->description(fn (Model $record) => Str::limit($record->description, 40))
                     ->tooltip(function (Model $record): ?string {
                         $description = $record->description;
 
@@ -228,11 +234,11 @@ class PermissionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
             ]);
     }
 
@@ -246,10 +252,10 @@ class PermissionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPermissions::route('/'),
-            'create' => Pages\CreatePermission::route('/create'),
-            'view' => Pages\ViewPermission::route('/{record}'),
-            'edit' => Pages\EditPermission::route('/{record}/edit'),
+            'index' => ListPermissions::route('/'),
+            'create' => CreatePermission::route('/create'),
+            'view' => ViewPermission::route('/{record}'),
+            'edit' => EditPermission::route('/{record}/edit'),
         ];
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\BadgeTextEditorResource\Pages;
+namespace App\Filament\Resources\Hotel\BadgeTextEditors\Pages;
 
-use App\Filament\Resources\Hotel\BadgeTextEditorResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Hotel\BadgeTextEditors\BadgeTextEditorResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use PDOException;
@@ -16,7 +17,7 @@ class EditBadgeTextEditor extends EditRecord
 
     protected function getActions(): array
     {
-        return [Actions\DeleteAction::make()];
+        return [DeleteAction::make()];
     }
 
     protected function mutateFormDataBeforeSave(array $data): array

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\User\UserResource\Pages;
+namespace App\Filament\Resources\User\Users\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Actions\SendCurrency;
 use App\Enums\CurrencyTypes;
 use App\Models\Game\Player\UserCurrency;
@@ -14,7 +15,7 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Filament\Resources\User\UserResource;
+use App\Filament\Resources\User\Users\UserResource;
 
 class EditUser extends EditRecord
 {
@@ -23,7 +24,7 @@ class EditUser extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 

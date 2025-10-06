@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\EmulatorSettingResource\Pages;
+namespace App\Filament\Resources\Hotel\EmulatorSettings\Pages;
 
-use App\Filament\Resources\Hotel\EmulatorSettingResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Hotel\EmulatorSettings\EmulatorSettingResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditEmulatorSetting extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

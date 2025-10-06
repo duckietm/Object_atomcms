@@ -1,11 +1,21 @@
 <?php
 
-namespace App\Filament\Resources\Hotel;
+namespace App\Filament\Resources\Hotel\OpenPositions;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Hotel\OpenPositions\Pages\ListOpenPositions;
+use App\Filament\Resources\Hotel\OpenPositions\Pages\CreateOpenPosition;
+use App\Filament\Resources\Hotel\OpenPositions\Pages\EditOpenPosition;
 use App\Filament\Resources\Hotel\OpenPositionResource\Pages;
 use App\Models\Community\Staff\WebsiteOpenPosition;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,15 +25,15 @@ class OpenPositionResource extends Resource
 {
     protected static ?string $model = WebsiteOpenPosition::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-briefcase';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-briefcase';
 
-    protected static ?string $navigationGroup = 'Hotel';
+    protected static string | \UnitEnum | null $navigationGroup = 'Hotel';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('permission_id')
+        return $schema
+            ->components([
+                Select::make('permission_id')
                     ->label('Rank')
                     ->relationship('permission', 'rank_name')
                     ->required()
@@ -44,15 +54,15 @@ class OpenPositionResource extends Resource
                             };
                         },
                     ]),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->label('Position Description')
                     ->required()
                     ->maxLength(65535)
                     ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('apply_from')
+                DateTimePicker::make('apply_from')
                     ->label('Application Start Date')
                     ->nullable(),
-                Forms\Components\DateTimePicker::make('apply_to')
+                DateTimePicker::make('apply_to')
                     ->label('Application End Date')
                     ->nullable(),
             ]);
@@ -62,32 +72,32 @@ class OpenPositionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('permission.rank_name')
+                TextColumn::make('permission.rank_name')
                     ->label('Rank')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->label('Description')
                     ->limit(50)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('apply_from')
+                TextColumn::make('apply_from')
                     ->label('Apply From')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('apply_to')
+                TextColumn::make('apply_to')
                     ->label('Apply To')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make()
                     ->requiresConfirmation()
                     ->modalHeading('Delete Open Position')
                     ->modalDescription('This will also delete all related staff applications. Are you sure?')
@@ -99,8 +109,8 @@ class OpenPositionResource extends Resource
                             ->body('The open position and its related staff applications have been deleted successfully.')
                     ),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                DeleteBulkAction::make()
                     ->requiresConfirmation()
                     ->modalHeading('Delete Open Positions')
                     ->modalDescription('This will also delete all related staff applications for the selected positions. Are you sure?')
@@ -117,9 +127,9 @@ class OpenPositionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOpenPositions::route('/'),
-            'create' => Pages\CreateOpenPosition::route('/create'),
-            'edit' => Pages\EditOpenPosition::route('/{record}/edit'),
+            'index' => ListOpenPositions::route('/'),
+            'create' => CreateOpenPosition::route('/create'),
+            'edit' => EditOpenPosition::route('/{record}/edit'),
         ];
     }
 }

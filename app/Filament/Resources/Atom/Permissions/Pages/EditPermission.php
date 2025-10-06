@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Atom\PermissionResource\Pages;
+namespace App\Filament\Resources\Atom\Permissions\Pages;
 
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\Atom\PermissionResource;
+use App\Filament\Resources\Atom\Permissions\PermissionResource;
 
 class EditPermission extends EditRecord
 {

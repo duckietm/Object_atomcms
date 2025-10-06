@@ -1,7 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\Hotel;
+namespace App\Filament\Resources\Hotel\BadgeTextEditors;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Table;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Hotel\BadgeTextEditors\Pages\ListBadgeTextEditors;
+use App\Filament\Resources\Hotel\BadgeTextEditors\Pages\CreateBadgeTextEditor;
+use App\Filament\Resources\Hotel\BadgeTextEditors\Pages\EditBadgeTextEditor;
 use App\Filament\Resources\Hotel\BadgeTextEditorResource\Pages;
 use App\Models\WebsiteBadge;
 use App\Services\SettingsService;
@@ -16,39 +26,39 @@ class BadgeTextEditorResource extends Resource
 {
     protected static ?string $model = WebsiteBadge::class;
 
-    protected static ?string $navigationGroup = 'Hotel';
-    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
+    protected static string | \UnitEnum | null $navigationGroup = 'Hotel';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-pencil-square';
     protected static ?string $navigationLabel = 'Badge Editor';
     protected static ?string $modelLabel = 'Badge Text';
     protected static ?string $slug = 'hotel/badge-text-editor';
 
-    public static function form(Forms\Form $form): Forms\Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('badge_key')
+        return $schema
+            ->components([
+                TextInput::make('badge_key')
                     ->required()
                     ->label('Badge Key - Expl. ATOM101')
                     ->placeholder('This is the badge code'),
-				Forms\Components\TextInput::make('badge_name')
+				TextInput::make('badge_name')
                     ->required()
                     ->label('Badge Name')
                     ->placeholder('This is the name of the badge: Expl. The ATOM Badge'),
-                Forms\Components\Textarea::make('badge_description')
+                Textarea::make('badge_description')
                     ->required()
                     ->label('Badge Description')
                     ->placeholder('Please add a description for the badge.'),
             ]);
     }
 
-    public static function table(Tables\Table $table): Tables\Table
+    public static function table(Table $table): Table
     {
         $settingsService = app(SettingsService::class);
         $badgesPath = $settingsService->getOrDefault('badges_path', '/gamedata/c_images/album1584/');
 
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('badge_key')
+                ImageColumn::make('badge_key')
                     ->label('Badge Image')
                     ->getStateUsing(function ($record) use ($badgesPath) {
                         $badgeName = str_replace('badge_desc_', '', $record->badge_key);
@@ -74,18 +84,18 @@ class BadgeTextEditorResource extends Resource
             ])
             ->filters([])
             ->defaultSort('badge_key', 'asc')
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBadgeTextEditors::route('/'),
-            'create' => Pages\CreateBadgeTextEditor::route('/create'),
-            'edit' => Pages\EditBadgeTextEditor::route('/{record}/edit'),
+            'index' => ListBadgeTextEditors::route('/'),
+            'create' => CreateBadgeTextEditor::route('/create'),
+            'edit' => EditBadgeTextEditor::route('/{record}/edit'),
         ];
     }
 }

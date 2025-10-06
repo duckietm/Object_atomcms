@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Atom\CameraWebResource\Pages;
+namespace App\Filament\Resources\Atom\CameraWebs\Pages;
 
-use App\Filament\Resources\Atom\CameraWebResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Atom\CameraWebs\CameraWebResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditCameraWeb extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

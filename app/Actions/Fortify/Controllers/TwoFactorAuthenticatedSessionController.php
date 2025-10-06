@@ -14,7 +14,7 @@ class TwoFactorAuthenticatedSessionController extends Controller
     /**
      * The guard implementation.
      *
-     * @var \Illuminate\Contracts\Auth\StatefulGuard
+     * @var StatefulGuard
      */
     protected $guard;
 

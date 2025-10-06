@@ -1,14 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\Atom;
+namespace App\Filament\Resources\Atom\HousekeepingPermissions;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Atom\HousekeepingPermissions\Pages\ListHousekeepingPermissions;
 use App\Filament\Resources\Atom\HousekeepingPermissionResource\Pages;
 use App\Filament\Resources\Atom\HousekeepingPermissionResource\RelationManagers;
 use App\Models\WebsiteHousekeepingPermission;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -20,9 +23,9 @@ class HousekeepingPermissionResource extends Resource
 {
     protected static ?string $model = WebsiteHousekeepingPermission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?string $navigationGroup = 'Website';
+    protected static string | \UnitEnum | null $navigationGroup = 'Website';
 
     protected static ?string $slug = 'website/housekeeping-permissions';
     
@@ -30,10 +33,10 @@ class HousekeepingPermissionResource extends Resource
 
     public static string $translateIdentifier = 'housekeeping-permissions';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-        ->schema([
+        return $schema
+        ->components([
             Section::make()
                 ->schema([
                     TextInput::make('permission')
@@ -92,11 +95,11 @@ class HousekeepingPermissionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 //
             ]);
     }
@@ -111,7 +114,7 @@ class HousekeepingPermissionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListHousekeepingPermissions::route('/'),
+            'index' => ListHousekeepingPermissions::route('/'),
         ];
     }
 }

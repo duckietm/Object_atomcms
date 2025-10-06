@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\OpenPositionResource\Pages;
+namespace App\Filament\Resources\Hotel\OpenPositions\Pages;
 
-use App\Filament\Resources\Hotel\OpenPositionResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Hotel\OpenPositions\OpenPositionResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListOpenPositions extends ListRecords
@@ -12,7 +13,7 @@ class ListOpenPositions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -1,25 +1,40 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\CatalogPageResource\RelationManagers;
+namespace App\Filament\Resources\Hotel\CatalogPages\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use App\Models\Game\Furniture\ItemBase;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 
 class CatalogItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'catalogItems';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('item_ids')
+        return $schema
+            ->components([
+                Select::make('item_ids')
                     ->label('Furniture Item')
                     ->relationship(
                         name: 'itemBase',
@@ -30,108 +45,108 @@ class CatalogItemsRelationManager extends RelationManager
                     ->required()
                     ->preload()
                     ->createOptionForm([
-                        Forms\Components\TextInput::make('sprite_id')
+                        TextInput::make('sprite_id')
                             ->label('Sprite ID')
                             ->numeric()
                             ->default(0),
-                        Forms\Components\TextInput::make('public_name')
+                        TextInput::make('public_name')
                             ->maxLength(56),
-                        Forms\Components\TextInput::make('item_name')
+                        TextInput::make('item_name')
                             ->required()
                             ->maxLength(70),
-                        Forms\Components\TextInput::make('type')
+                        TextInput::make('type')
                             ->default('s')
                             ->maxLength(3),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\TextInput::make('width')
+                                TextInput::make('width')
                                     ->numeric()
                                     ->default(1),
-                                Forms\Components\TextInput::make('length')
+                                TextInput::make('length')
                                     ->numeric()
                                     ->default(1),
-                                Forms\Components\TextInput::make('stack_height')
+                                TextInput::make('stack_height')
                                     ->numeric()
                                     ->default(0.00),
                             ]),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\Toggle::make('allow_stack')
+                                Toggle::make('allow_stack')
                                     ->default(true),
-                                Forms\Components\Toggle::make('allow_sit')
+                                Toggle::make('allow_sit')
                                     ->default(false),
-                                Forms\Components\Toggle::make('allow_lay')
+                                Toggle::make('allow_lay')
                                     ->default(false),
                             ]),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\Toggle::make('allow_walk')
+                                Toggle::make('allow_walk')
                                     ->default(false),
-                                Forms\Components\Toggle::make('allow_gift')
+                                Toggle::make('allow_gift')
                                     ->default(true),
-                                Forms\Components\Toggle::make('allow_trade')
+                                Toggle::make('allow_trade')
                                     ->default(true),
                             ]),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\Toggle::make('allow_recycle')
+                                Toggle::make('allow_recycle')
                                     ->default(false),
-                                Forms\Components\Toggle::make('allow_marketplace_sell')
+                                Toggle::make('allow_marketplace_sell')
                                     ->default(false),
-                                Forms\Components\Toggle::make('allow_inventory_stack')
+                                Toggle::make('allow_inventory_stack')
                                     ->default(true),
                             ]),
-                        Forms\Components\TextInput::make('interaction_type')
+                        TextInput::make('interaction_type')
                             ->default('default')
                             ->maxLength(500),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('interaction_modes_count')
+                                TextInput::make('interaction_modes_count')
                                     ->numeric()
                                     ->default(1),
-                                Forms\Components\TextInput::make('vending_ids')
+                                TextInput::make('vending_ids')
                                     ->default('0')
                                     ->maxLength(255),
                             ]),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('multiheight')
+                                TextInput::make('multiheight')
                                     ->default('0')
                                     ->maxLength(50),
-                                Forms\Components\TextInput::make('customparams')
+                                TextInput::make('customparams')
                                     ->maxLength(256),
                             ]),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('effect_id_male')
+                                TextInput::make('effect_id_male')
                                     ->numeric()
                                     ->default(0),
-                                Forms\Components\TextInput::make('effect_id_female')
+                                TextInput::make('effect_id_female')
                                     ->numeric()
                                     ->default(0),
                             ]),
-                        Forms\Components\TextInput::make('clothing_on_walk')
+                        TextInput::make('clothing_on_walk')
                             ->maxLength(255),
                     ])
                     ->columnSpanFull(),
 
-                Forms\Components\TextInput::make('catalog_name')
+                TextInput::make('catalog_name')
                     ->label('Catalog Name')
                     ->required()
                     ->maxLength(100)
                     ->nullable()
                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
 
-                Forms\Components\Grid::make(2)
+                Grid::make(2)
                     ->schema([
-                        Forms\Components\TextInput::make('cost_credits')
+                        TextInput::make('cost_credits')
                             ->label('Cost Credits')
                             ->numeric()
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state)
                             ->default(3),
 
-                        Forms\Components\TextInput::make('cost_points')
+                        TextInput::make('cost_points')
                             ->label('Cost Points')
                             ->numeric()
                             ->nullable()
@@ -139,16 +154,16 @@ class CatalogItemsRelationManager extends RelationManager
                             ->default(0),
                     ]),
 
-                Forms\Components\Grid::make(2)
+                Grid::make(2)
                     ->schema([
-                        Forms\Components\TextInput::make('points_type')
+                        TextInput::make('points_type')
                             ->label('Points Type')
                             ->numeric()
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state)
                             ->default(0),
 
-                        Forms\Components\TextInput::make('amount')
+                        TextInput::make('amount')
                             ->label('Amount')
                             ->numeric()
                             ->nullable()
@@ -156,51 +171,51 @@ class CatalogItemsRelationManager extends RelationManager
                             ->default(1),
                     ]),
 
-                Forms\Components\Grid::make(2)
+                Grid::make(2)
                     ->schema([
-                        Forms\Components\Toggle::make('limited_stack')
+                        Toggle::make('limited_stack')
                             ->label('Limited Stack')
                             ->dehydrateStateUsing(fn ($state) => $state ? '1' : '0'),
 
-                        Forms\Components\Toggle::make('limited_sells')
+                        Toggle::make('limited_sells')
                             ->label('Limited Sells')
                             ->dehydrateStateUsing(fn ($state) => $state ? '1' : '0'),
                     ]),
 
-                Forms\Components\Grid::make(3)
+                Grid::make(3)
                     ->schema([
-                        Forms\Components\TextInput::make('order_number')
+                        TextInput::make('order_number')
                             ->numeric()
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state)
                             ->default(1),
 
-                        Forms\Components\TextInput::make('offer_id')
+                        TextInput::make('offer_id')
                             ->numeric()
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
 
-                        Forms\Components\TextInput::make('song_id')
+                        TextInput::make('song_id')
                             ->numeric()
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state)
                             ->default(0),
                     ]),
 
-                Forms\Components\Textarea::make('extradata')
+                Textarea::make('extradata')
                     ->label('Extra Data')
                     ->maxLength(500)
                     ->nullable()
                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
 
-                Forms\Components\Grid::make(2)
+                Grid::make(2)
                     ->schema([
-                        Forms\Components\Toggle::make('have_offer')
+                        Toggle::make('have_offer')
                             ->label('Have Offer')
                             ->default(true)
                             ->dehydrateStateUsing(fn ($state) => $state ? '1' : '0'),
 
-                        Forms\Components\Toggle::make('club_only')
+                        Toggle::make('club_only')
                             ->label('Club Only')
                             ->default(false)
                             ->dehydrateStateUsing(fn ($state) => $state ? '1' : '0'),
@@ -212,58 +227,58 @@ class CatalogItemsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('catalog_name')
             ->columns([
-                Tables\Columns\ImageColumn::make('icon')
+                ImageColumn::make('icon')
                     ->getStateUsing(fn ($record) => url($record->itemBase?->icon()))
                     ->size('25px')
 
                     ->label('Icon')
                     ->circular(),
 
-                Tables\Columns\TextColumn::make('itemBase.item_name')
+                TextColumn::make('itemBase.item_name')
                     ->label('Furniture Name')
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('catalog_name')
+                TextColumn::make('catalog_name')
                     ->label('Catalog Name')
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('cost_credits')
+                TextColumn::make('cost_credits')
                     ->label('Credits')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('cost_points')
+                TextColumn::make('cost_points')
                     ->label('Points')
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('limited_stack')
+                IconColumn::make('limited_stack')
                     ->label('Limited')
                     ->boolean(),
 
-                Tables\Columns\IconColumn::make('club_only')
+                IconColumn::make('club_only')
                     ->label('HC Only')
                     ->boolean(),
 
-                Tables\Columns\TextColumn::make('itemBase.type')
+                TextColumn::make('itemBase.type')
                     ->label('Type')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('itemBase.width')
+                TextColumn::make('itemBase.width')
                     ->label('Width')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('itemBase.length')
+                TextColumn::make('itemBase.length')
                     ->label('Length')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('order_number')
+                TextColumn::make('order_number')
                     ->label('Order')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
+                SelectFilter::make('type')
                     ->query(function (Builder $query, array $data): Builder {
                         return empty($data['values'])
                             ? $query
@@ -283,18 +298,18 @@ class CatalogItemsRelationManager extends RelationManager
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\TernaryFilter::make('club_only')
+                TernaryFilter::make('club_only')
                     ->label('HC Only'),
 
-                Tables\Filters\TernaryFilter::make('limited_stack')
+                TernaryFilter::make('limited_stack')
                     ->label('Limited'),
             ])
             ->defaultSort('order_number')
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()->label('Edit Catalog Item'),
+            ->recordActions([
+                EditAction::make()->label('Edit Catalog Item'),
 
                 Action::make('editItemBase')
                     ->label('Edit Item base')
@@ -334,96 +349,96 @@ class CatalogItemsRelationManager extends RelationManager
                             'clothing_on_walk' => $itemBase->clothing_on_walk,
                         ];
                     })
-                    ->form([
-                        Forms\Components\TextInput::make('sprite_id')
+                    ->schema([
+                        TextInput::make('sprite_id')
                             ->label('Sprite ID')
                             ->numeric()
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                        Forms\Components\TextInput::make('public_name')
+                        TextInput::make('public_name')
                             ->label('Public Name')
                             ->maxLength(56)
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                        Forms\Components\TextInput::make('item_name')
+                        TextInput::make('item_name')
                             ->label('Item Name')
                             ->required()
                             ->maxLength(70),
-                        Forms\Components\TextInput::make('type')
+                        TextInput::make('type')
                             ->maxLength(3)
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\TextInput::make('width')
+                                TextInput::make('width')
                                     ->numeric()
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                                Forms\Components\TextInput::make('length')
+                                TextInput::make('length')
                                     ->numeric()
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                                Forms\Components\TextInput::make('stack_height')
+                                TextInput::make('stack_height')
                                     ->numeric()
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
                             ]),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\Toggle::make('allow_stack'),
-                                Forms\Components\Toggle::make('allow_sit'),
-                                Forms\Components\Toggle::make('allow_lay'),
+                                Toggle::make('allow_stack'),
+                                Toggle::make('allow_sit'),
+                                Toggle::make('allow_lay'),
                             ]),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\Toggle::make('allow_walk'),
-                                Forms\Components\Toggle::make('allow_gift'),
-                                Forms\Components\Toggle::make('allow_trade'),
+                                Toggle::make('allow_walk'),
+                                Toggle::make('allow_gift'),
+                                Toggle::make('allow_trade'),
                             ]),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\Toggle::make('allow_recycle'),
-                                Forms\Components\Toggle::make('allow_marketplace_sell'),
-                                Forms\Components\Toggle::make('allow_inventory_stack'),
+                                Toggle::make('allow_recycle'),
+                                Toggle::make('allow_marketplace_sell'),
+                                Toggle::make('allow_inventory_stack'),
                             ]),
-                        Forms\Components\TextInput::make('interaction_type')
+                        TextInput::make('interaction_type')
                             ->maxLength(500)
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('interaction_modes_count')
+                                TextInput::make('interaction_modes_count')
                                     ->numeric()
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                                Forms\Components\TextInput::make('vending_ids')
+                                TextInput::make('vending_ids')
                                     ->maxLength(255)
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
                             ]),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('multiheight')
+                                TextInput::make('multiheight')
                                     ->maxLength(50)
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                                Forms\Components\TextInput::make('customparams')
+                                TextInput::make('customparams')
                                     ->maxLength(256)
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
                             ]),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('effect_id_male')
+                                TextInput::make('effect_id_male')
                                     ->numeric()
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
-                                Forms\Components\TextInput::make('effect_id_female')
+                                TextInput::make('effect_id_female')
                                     ->numeric()
                                     ->nullable()
                                     ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
                             ]),
-                        Forms\Components\TextInput::make('clothing_on_walk')
+                        TextInput::make('clothing_on_walk')
                             ->maxLength(255)
                             ->nullable()
                             ->dehydrateStateUsing(fn ($state) => $state === null ? '' : $state),
@@ -443,11 +458,11 @@ class CatalogItemsRelationManager extends RelationManager
                         $record->itemBase->forceFill($data)->save();
                     })
                     ->visible(fn ($record) => $record->itemBase !== null),
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

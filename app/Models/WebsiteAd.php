@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +46,7 @@ class WebsiteAd extends Model
                 } else {
                     logger()->warning('Image file not found:', ['file' => $websiteAd->image]);
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 logger()->error('Failed to delete image file:', [
                     'file' => $websiteAd->image,
                     'error' => $e->getMessage(),

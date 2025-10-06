@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\EmulatorSettingResource\Pages;
+namespace App\Filament\Resources\Hotel\EmulatorSettings\Pages;
 
-use App\Filament\Resources\Hotel\EmulatorSettingResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Hotel\EmulatorSettings\EmulatorSettingResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListEmulatorSettings extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

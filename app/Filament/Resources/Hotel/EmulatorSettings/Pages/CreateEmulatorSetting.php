@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\EmulatorSettingResource\Pages;
+namespace App\Filament\Resources\Hotel\EmulatorSettings\Pages;
 
-use App\Filament\Resources\Hotel\EmulatorSettingResource;
+use App\Filament\Resources\Hotel\EmulatorSettings\EmulatorSettingResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

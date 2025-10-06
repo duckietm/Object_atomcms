@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\User\BanResource\Pages;
+namespace App\Filament\Resources\User\Bans\Pages;
 
 use Filament\Resources\Pages\ManageRecords;
-use App\Filament\Resources\User\BanResource;
+use App\Filament\Resources\User\Bans\BanResource;
 
 class ManageBans extends ManageRecords
 {

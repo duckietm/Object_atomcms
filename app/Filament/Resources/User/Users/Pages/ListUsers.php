@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\User\UserResource\Pages;
+namespace App\Filament\Resources\User\Users\Pages;
 
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use App\Models\User;
 use Filament\Actions;
 use App\Enums\NotificationType;
@@ -11,7 +13,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\User\UserResource;
+use App\Filament\Resources\User\Users\UserResource;
 
 class ListUsers extends ListRecords
 {
@@ -20,12 +22,12 @@ class ListUsers extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\Action::make(__('filament::resources.actions.send_notifications'))
+            Action::make(__('filament::resources.actions.send_notifications'))
                 ->modal()
                 ->color('gray')
                 ->modalHeading(__('filament::resources.actions.send_notifications'))
                 ->icon('heroicon-o-bell')
-                ->form([
+                ->schema([
                     Select::make('users')
                         ->label(__('filament::resources.inputs.users'))
                         ->searchable()
@@ -77,7 +79,7 @@ class ListUsers extends ListRecords
                         ->send();
                 }),
 
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

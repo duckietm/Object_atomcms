@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Hotel;
+namespace App\Filament\Resources\Hotel\WebsiteAds;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\FileUpload;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Hotel\WebsiteAds\Pages\ListWebsiteAds;
+use App\Filament\Resources\Hotel\WebsiteAds\Pages\CreateWebsiteAd;
 use App\Filament\Resources\Hotel\WebsiteAdResource\Pages;
 use App\Models\WebsiteAd;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,15 +23,15 @@ class WebsiteAdResource extends Resource
 {
     protected static ?string $model = WebsiteAd::class;
 
-    protected static ?string $navigationGroup = 'Hotel';
+    protected static string | \UnitEnum | null $navigationGroup = 'Hotel';
     protected static ?string $navigationLabel = 'ADS Images';
-    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-sparkles';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\FileUpload::make('image')
+        return $schema
+            ->components([
+                FileUpload::make('image')
                     ->label('Image')
                     ->disk('ads')
                     ->preserveFilenames()
@@ -63,8 +67,8 @@ class WebsiteAdResource extends Resource
             ])
             ->filters([
             ])
-            ->actions([
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                DeleteAction::make(),
             ])
             ->searchable();
     }
@@ -72,8 +76,8 @@ class WebsiteAdResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWebsiteAds::route('/'),
-            'create' => Pages\CreateWebsiteAd::route('/create'),
+            'index' => ListWebsiteAds::route('/'),
+            'create' => CreateWebsiteAd::route('/create'),
         ];
     }
 }

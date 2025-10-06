@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Atom\TeamResource\Pages;
+namespace App\Filament\Resources\Atom\Teams\Pages;
 
+use Filament\Actions\CreateAction;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\Atom\TeamResource;
+use App\Filament\Resources\Atom\Teams\TeamResource;
 
 class ListTeams extends ListRecords
 {
@@ -13,7 +14,7 @@ class ListTeams extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

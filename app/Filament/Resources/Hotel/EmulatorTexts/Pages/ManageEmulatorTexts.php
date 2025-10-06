@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\EmulatorTextResource\Pages;
+namespace App\Filament\Resources\Hotel\EmulatorTexts\Pages;
 
 use Filament\Resources\Pages\ManageRecords;
-use App\Filament\Resources\Hotel\EmulatorTextResource;
+use App\Filament\Resources\Hotel\EmulatorTexts\EmulatorTextResource;
 use Filament\Actions\CreateAction;
 
 class ManageEmulatorTexts extends ManageRecords

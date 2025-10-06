@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Atom\TagResource\Pages;
+namespace App\Filament\Resources\Atom\Tags\Pages;
 
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\Atom\TagResource;
+use App\Filament\Resources\Atom\Tags\TagResource;
 
 class ViewTag extends ViewRecord
 {

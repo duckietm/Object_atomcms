@@ -1,16 +1,32 @@
 <?php
 
-namespace App\Filament\Resources\Atom;
+namespace App\Filament\Resources\Atom\Articles;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Exception;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use App\Filament\Resources\Atom\Articles\RelationManagers\TagsRelationManager;
+use App\Filament\Resources\Atom\Articles\Pages\ListArticles;
+use App\Filament\Resources\Atom\Articles\Pages\CreateArticle;
+use App\Filament\Resources\Atom\Articles\Pages\ViewArticle;
+use App\Filament\Resources\Atom\Articles\Pages\EditArticle;
 use App\Models\Articles\WebsiteArticle;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables;
-use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -28,18 +44,18 @@ class ArticleResource extends Resource
 
     protected static ?string $model = WebsiteArticle::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-newspaper';
 
-    protected static ?string $navigationGroup = 'Website';
+    protected static string | \UnitEnum | null $navigationGroup = 'Website';
 
     protected static ?string $slug = 'website/articles';
 
     public static string $translateIdentifier = 'articles';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(static::getForm());
+        return $schema
+            ->components(static::getForm());
     }
 
     public static function getForm(): array
@@ -47,7 +63,7 @@ class ArticleResource extends Resource
         return [
             Tabs::make('Main')
                 ->tabs([
-                    Tabs\Tab::make(__('filament::resources.tabs.Home'))
+                    Tab::make(__('filament::resources.tabs.Home'))
                         ->icon('heroicon-o-home')
                         ->schema([
                             TextInput::make('title')
@@ -78,7 +94,7 @@ class ArticleResource extends Resource
                                 ->default(fn () => auth()->check() ? auth()->user()->id : null),
                         ]),
 
-                    Tabs\Tab::make(__('filament::resources.tabs.Configurations'))
+                    Tab::make(__('filament::resources.tabs.Configurations'))
                         ->icon('heroicon-o-cog')
                         ->schema([
                             Toggle::make('is_visible')
@@ -98,7 +114,7 @@ class ArticleResource extends Resource
                                         } else {
                                             $record->delete();
                                         }
-                                    } catch (\Exception $e) {
+                                    } catch (Exception $e) {
                                         report($e);
                                     }
                                 })
@@ -126,19 +142,19 @@ class ArticleResource extends Resource
             ->poll('60s')
             ->columns(static::getTable())
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+                RestoreAction::make(),
+                ForceDeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\RestoreBulkAction::make(),
-                Tables\Actions\ForceDeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
+                RestoreBulkAction::make(),
+                ForceDeleteBulkAction::make(),
             ]);
     }
 
@@ -188,17 +204,17 @@ class ArticleResource extends Resource
 	public static function getRelations(): array
     {
         return [
-            RelationManagers\TagsRelationManager::class,
+            TagsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListArticles::route('/'),
-            'create' => Pages\CreateArticle::route('/create'),
-            'view' => Pages\ViewArticle::route('/{record}'),
-            'edit' => Pages\EditArticle::route('/{record}/edit'),
+            'index' => ListArticles::route('/'),
+            'create' => CreateArticle::route('/create'),
+            'view' => ViewArticle::route('/{record}'),
+            'edit' => EditArticle::route('/{record}/edit'),
         ];
     }
 

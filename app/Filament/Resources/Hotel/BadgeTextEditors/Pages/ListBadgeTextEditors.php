@@ -1,8 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\BadgeTextEditorResource\Pages;
+namespace App\Filament\Resources\Hotel\BadgeTextEditors\Pages;
 
-use App\Filament\Resources\Hotel\BadgeTextEditorResource;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
+use Exception;
+use App\Filament\Resources\Hotel\BadgeTextEditors\BadgeTextEditorResource;
 use App\Models\WebsiteBadge;
 use App\Services\SettingsService;
 use Filament\Pages\Actions;
@@ -18,7 +21,7 @@ class ListBadgeTextEditors extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make()
+            CreateAction::make()
                 ->label('Add Badge')
 				        ->color('info')
                 ->modalHeading('Add a New Badge')
@@ -30,10 +33,10 @@ class ListBadgeTextEditors extends ListRecords
                         ->success()
                         ->send();
                 }),
-            Actions\Action::make('export')
+            Action::make('export')
                 ->label('Export to ExternalTexts')
                 ->action('exportToJson'),
-            Actions\Action::make('backup')
+            Action::make('backup')
                 ->label('Create Backup of ExternalTexts')
                 ->color('success')
                 ->action('createBackup'),
@@ -88,7 +91,7 @@ class ListBadgeTextEditors extends ListRecords
             );
 
             if ($result === false) {
-                throw new \Exception('Failed to write to the JSON file.');
+                throw new Exception('Failed to write to the JSON file.');
             }
 
             Notification::make()
@@ -96,7 +99,7 @@ class ListBadgeTextEditors extends ListRecords
                 ->body('Badge data exported successfully.')
                 ->success()
                 ->send();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to export badge data: ' . $e->getMessage());
 
             Notification::make()

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Atom\ArticleResource\Pages;
+namespace App\Filament\Resources\Atom\Articles\Pages;
 
+use Filament\Actions\DeleteAction;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\Atom\ArticleResource;
+use App\Filament\Resources\Atom\Articles\ArticleResource;
 
 class EditArticle extends EditRecord
 {
@@ -13,7 +14,7 @@ class EditArticle extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

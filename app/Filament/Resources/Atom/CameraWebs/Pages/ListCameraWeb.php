@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Atom\CameraWebResource\Pages;
+namespace App\Filament\Resources\Atom\CameraWebs\Pages;
 
-use App\Filament\Resources\Atom\CameraWebResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Atom\CameraWebs\CameraWebResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListCameraWeb extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

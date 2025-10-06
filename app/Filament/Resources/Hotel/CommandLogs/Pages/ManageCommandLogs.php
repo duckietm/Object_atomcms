@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\CommandLogResource\Pages;
+namespace App\Filament\Resources\Hotel\CommandLogs\Pages;
 
 use Filament\Resources\Pages\ManageRecords;
-use App\Filament\Resources\Hotel\CommandLogResource;
+use App\Filament\Resources\Hotel\CommandLogs\CommandLogResource;
 
 class ManageCommandLogs extends ManageRecords
 {

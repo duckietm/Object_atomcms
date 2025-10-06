@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Atom\PermissionResource\Pages;
+namespace App\Filament\Resources\Atom\Permissions\Pages;
 
-use App\Filament\Resources\Atom\PermissionResource;
+use App\Filament\Resources\Atom\Permissions\PermissionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

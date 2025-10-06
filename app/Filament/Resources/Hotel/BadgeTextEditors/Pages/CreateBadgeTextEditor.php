@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\BadgeTextEditorResource\Pages;
+namespace App\Filament\Resources\Hotel\BadgeTextEditors\Pages;
 
-use App\Filament\Resources\Hotel\BadgeTextEditorResource;
+use App\Filament\Resources\Hotel\BadgeTextEditors\BadgeTextEditorResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

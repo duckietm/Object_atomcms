@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Atom\CmsSettingResource\Pages;
+namespace App\Filament\Resources\Atom\CmsSettings\Pages;
 
+use Filament\Actions\CreateAction;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
-use App\Filament\Resources\Atom\CmsSettingResource;
+use App\Filament\Resources\Atom\CmsSettings\CmsSettingResource;
 
 class ManageCmsSettings extends ManageRecords
 {
@@ -13,7 +14,7 @@ class ManageCmsSettings extends ManageRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 

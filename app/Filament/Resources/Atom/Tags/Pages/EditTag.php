@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Atom\TagResource\Pages;
+namespace App\Filament\Resources\Atom\Tags\Pages;
 
+use Filament\Actions\DeleteAction;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\Atom\TagResource;
+use App\Filament\Resources\Atom\Tags\TagResource;
 
 class EditTag extends EditRecord
 {
@@ -13,7 +14,7 @@ class EditTag extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

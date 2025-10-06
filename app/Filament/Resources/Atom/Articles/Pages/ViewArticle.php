@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Atom\ArticleResource\Pages;
+namespace App\Filament\Resources\Atom\Articles\Pages;
 
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\Atom\ArticleResource;
+use App\Filament\Resources\Atom\Articles\ArticleResource;
 use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;

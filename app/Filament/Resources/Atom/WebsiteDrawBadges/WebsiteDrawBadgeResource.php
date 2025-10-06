@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\Atom;
+namespace App\Filament\Resources\Atom\WebsiteDrawBadges;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Atom\WebsiteDrawBadges\Pages\ListWebsiteDrawBadge;
+use App\Filament\Resources\Atom\WebsiteDrawBadges\Pages\EditWebsiteDrawBadge;
 use App\Models\WebsiteDrawBadge;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -21,9 +23,9 @@ class WebsiteDrawBadgeResource extends Resource
 {
     protected static ?string $model = WebsiteDrawBadge::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-trophy';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-trophy';
 
-    protected static ?string $navigationGroup = 'Website';
+    protected static string | \UnitEnum | null $navigationGroup = 'Website';
 
     protected static ?string $slug = 'draw-badges';
 
@@ -31,10 +33,10 @@ class WebsiteDrawBadgeResource extends Resource
 
     protected static ?string $navigationLabel = 'Draw Badges';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('badge_name')
                     ->label(__('Badge Name'))
                     ->nullable()
@@ -90,7 +92,7 @@ class WebsiteDrawBadgeResource extends Resource
                 ToggleColumn::make('published')
                     ->label(__('Published')),
             ])
-            ->actions([
+            ->recordActions([
                 DeleteAction::make()
                     ->before(function (DeleteAction $action, WebsiteDrawBadge $record) {
                         $badgeCode = pathinfo($record->badge_path, PATHINFO_FILENAME);
@@ -120,7 +122,7 @@ class WebsiteDrawBadgeResource extends Resource
                         }
                     }),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 DeleteBulkAction::make()
                     ->before(function (DeleteBulkAction $action, $records) {
                         foreach ($records as $record) {
@@ -160,8 +162,8 @@ class WebsiteDrawBadgeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWebsiteDrawBadge::route('/'),
-            'edit' => Pages\EditWebsiteDrawBadge::route('/{record}/edit'),
+            'index' => ListWebsiteDrawBadge::route('/'),
+            'edit' => EditWebsiteDrawBadge::route('/{record}/edit'),
         ];
     }
 

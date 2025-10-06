@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\WebsiteAdResource\Pages;
+namespace App\Filament\Resources\Hotel\WebsiteAds\Pages;
 
-use App\Filament\Resources\Hotel\WebsiteAdResource;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
+use App\Filament\Resources\Hotel\WebsiteAds\WebsiteAdResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\WebsiteAd;
 
@@ -16,7 +17,7 @@ class ListWebsiteAds extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make()
+            CreateAction::make()
                 ->label('Create new ADS')
 				->color('success'),
             Action::make('importAdsData')

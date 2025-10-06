@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\User\UserResource\Pages;
+namespace App\Filament\Resources\User\Users\Pages;
 
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\User\UserResource;
+use App\Filament\Resources\User\Users\UserResource;
 
 class ViewUser extends ViewRecord
 {

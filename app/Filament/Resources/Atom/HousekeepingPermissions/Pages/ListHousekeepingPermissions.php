@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Atom\HousekeepingPermissionResource\Pages;
+namespace App\Filament\Resources\Atom\HousekeepingPermissions\Pages;
 
-use App\Filament\Resources\Atom\HousekeepingPermissionResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Atom\HousekeepingPermissions\HousekeepingPermissionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListHousekeepingPermissions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

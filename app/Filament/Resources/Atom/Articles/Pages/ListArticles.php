@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Atom\ArticleResource\Pages;
+namespace App\Filament\Resources\Atom\Articles\Pages;
 
+use Filament\Actions\CreateAction;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\Atom\ArticleResource;
+use App\Filament\Resources\Atom\Articles\ArticleResource;
 
 class ListArticles extends ListRecords
 {
@@ -13,7 +14,7 @@ class ListArticles extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

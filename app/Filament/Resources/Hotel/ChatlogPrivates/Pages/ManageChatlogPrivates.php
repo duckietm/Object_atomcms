@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\ChatlogPrivateResource\Pages;
+namespace App\Filament\Resources\Hotel\ChatlogPrivates\Pages;
 
-use App\Filament\Resources\Hotel\ChatlogPrivateResource;
+use App\Filament\Resources\Hotel\ChatlogPrivates\ChatlogPrivateResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 

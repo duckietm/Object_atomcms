@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\Atom\ArticleResource\Pages;
+namespace App\Filament\Resources\Atom\Articles\Pages;
 
 use App\Models\User;
 use App\Models\Article;
 use App\Enums\NotificationType;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\Atom\ArticleResource;
+use App\Filament\Resources\Atom\Articles\ArticleResource;
 
 class CreateArticle extends CreateRecord
 {

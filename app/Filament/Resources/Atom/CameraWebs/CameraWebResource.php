@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Atom;
+namespace App\Filament\Resources\Atom\CameraWebs;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Atom\CameraWebs\Pages\ListCameraWeb;
+use App\Filament\Resources\Atom\CameraWebs\Pages\EditCameraWeb;
 use App\Models\Miscellaneous\CameraWeb;
 use Filament\Tables;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Filament\Resources\Atom\CameraWebResource\Pages;
 use Filament\Resources\Resource;
@@ -18,19 +22,19 @@ class CameraWebResource extends Resource
 {
     protected static ?string $model = CameraWeb::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-photo';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-photo';
 
-	protected static ?string $navigationGroup = 'Website';
+	protected static string | \UnitEnum | null $navigationGroup = 'Website';
 
     protected static ?string $slug = 'camera-web';
 
     protected static ?string $pluralModelLabel = 'photos';
 	protected static ?string $navigationLabel = 'Web Camera';
 
-	public static function form(Form $form): Form
+	public static function form(Schema $schema): Schema
 {
-    return $form
-        ->schema([
+    return $schema
+        ->components([
             Toggle::make('visible')
                 ->label(__('Visible'))
                 ->default(true),
@@ -59,11 +63,11 @@ class CameraWebResource extends Resource
 				ToggleColumn::make('visible')
 					->label(__('Visible'))
             ])
-            ->actions([
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 
@@ -76,8 +80,8 @@ class CameraWebResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCameraWeb::route('/'),
-            'edit' => Pages\EditCameraWeb::route('/{record}/edit'),
+            'index' => ListCameraWeb::route('/'),
+            'edit' => EditCameraWeb::route('/{record}/edit'),
         ];
     }
 

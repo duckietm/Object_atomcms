@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\AchievementResource\Pages;
+namespace App\Filament\Resources\Hotel\Achievements\Pages;
 
-use App\Filament\Resources\Hotel\AchievementResource;
+use App\Filament\Resources\Hotel\Achievements\AchievementResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 

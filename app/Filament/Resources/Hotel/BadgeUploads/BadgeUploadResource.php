@@ -1,25 +1,27 @@
 <?php
 
-namespace App\Filament\Resources\Hotel;
+namespace App\Filament\Resources\Hotel\BadgeUploads;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use App\Filament\Resources\Hotel\BadgeUploads\Pages\ManageBadgeUploads;
 use Filament\Resources\Resource;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Support\Facades\Storage;
-use App\Filament\Resources\Hotel\BadgeUploadResource\Pages;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class BadgeUploadResource extends Resource
 {
-    protected static ?string $navigationGroup = 'Hotel';
-	  protected static ?string $navigationIcon = 'heroicon-o-gif';
+    protected static string | \UnitEnum | null $navigationGroup = 'Hotel';
+	  protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-gif';
     protected static ?string $label = 'Badge Upload';
 
-    public static function form(Forms\Form $form): Forms\Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\FileUpload::make('badge_file')
+        return $schema
+            ->components([
+                FileUpload::make('badge_file')
                     ->label('Upload Badge')
                     ->disk('local')
                     ->directory(setting('badge_path_filesystem'))
@@ -32,14 +34,14 @@ class BadgeUploadResource extends Resource
             ]);
     }
 
-    public static function table(Tables\Table $table): Tables\Table
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('filename')
+                TextColumn::make('filename')
                     ->label('File Name')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('path')
+                TextColumn::make('path')
                     ->label('File Path'),
             ])
             ->filters([]);
@@ -48,7 +50,7 @@ class BadgeUploadResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageBadgeUploads::route('/'),
+            'index' => ManageBadgeUploads::route('/'),
         ];
     }
 

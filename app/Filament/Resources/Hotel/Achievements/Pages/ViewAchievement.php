@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\AchievementResource\Pages;
+namespace App\Filament\Resources\Hotel\Achievements\Pages;
 
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\Hotel\AchievementResource;
+use App\Filament\Resources\Hotel\Achievements\AchievementResource;
 
 class ViewAchievement extends ViewRecord
 {

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Hotel\WebsiteAdResource\Pages;
+namespace App\Filament\Resources\Hotel\WebsiteAds\Pages;
 
-use App\Filament\Resources\Hotel\WebsiteAdResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Hotel\WebsiteAds\WebsiteAdResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditWebsiteAd extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }
