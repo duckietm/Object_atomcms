@@ -29,6 +29,10 @@
         clickRow(e) {
             const multi = !!(e.ctrlKey || e.metaKey);
             $wire.toggleSelectItem(this.itemId, multi);
+        },
+        openEditor() {
+            // Filament v4 + InteractsWithTable
+            $wire.mountTableAction('quickEdit', this.itemId);
         }
     }"
     x-init="
@@ -38,9 +42,10 @@
     draggable="true"
     @dragstart="dragStart($event)"
     @click.stop="clickRow($event)"
-    class="flex items-center gap-2 px-2 py-1 rounded cursor-default"
+    @dblclick.stop="openEditor()"  {{-- Double-click to open modal --}}
+    class="flex items-center gap-2 px-2 py-1 rounded cursor-pointer"
     :class="highlight ? 'bg-blue-50 dark:bg-primary-900/20 ring-1 ring-blue-400/40' : ''"
-    title="Drag onto a menu to move. Use the checkbox to multi-select."
+    title="Double-click to edit. Drag onto a menu to move. Use the checkbox to multi-select."
 >
     <img src="{{ $resolvedIcon }}" alt="" class="h-6 w-6 shrink-0" loading="lazy" />
     <span class="truncate">{{ $resolvedName }}</span>

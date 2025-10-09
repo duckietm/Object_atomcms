@@ -13,6 +13,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "itsgoingd/clockwork": "*",
         "jenssegers/agent": "^2.6",
+        "khatabwedaa/blade-css-icons": "^1.5",
         "laravel/fortify": "^1.16",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
