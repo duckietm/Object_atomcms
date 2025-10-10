@@ -3,6 +3,7 @@
     'name' => '',
     'itemId' => null,
     'isSelected' => false,
+	'reordering' => false,
 ])
 
 @php
@@ -21,6 +22,12 @@
             this.highlight = arr.includes(this.itemId);
         },
         dragStart(e) {
+            // guard: don't start custom DnD if table is in reorder mode
+            @if($reordering)
+                e.preventDefault();
+                return;
+            @endif
+
             const arr = Array.isArray(window.catalogSelIds) ? window.catalogSelIds : [];
             const ids = arr.includes(this.itemId) ? arr : [this.itemId];
             e.dataTransfer.effectAllowed = 'move';
@@ -31,7 +38,6 @@
             $wire.toggleSelectItem(this.itemId, multi);
         },
         openEditor() {
-            // Filament v4 + InteractsWithTable
             $wire.mountTableAction('quickEdit', this.itemId);
         }
     }"
@@ -39,10 +45,11 @@
         compute();
         window.addEventListener('catalog-sel-refresh', () => compute());
     "
-    draggable="true"
+    {{-- IMPORTANT: disable element drag when reordering is on --}}
+    :draggable="{{ $reordering ? 'false' : 'true' }}"
     @dragstart="dragStart($event)"
     @click.stop="clickRow($event)"
-    @dblclick.stop="openEditor()"  {{-- Double-click to open modal --}}
+    @dblclick.stop="openEditor()"
     class="flex items-center gap-2 px-2 py-1 rounded cursor-pointer"
     :class="highlight ? 'bg-blue-50 dark:bg-primary-900/20 ring-1 ring-blue-400/40' : ''"
     title="Double-click to edit. Drag onto a menu to move. Use the checkbox to multi-select."

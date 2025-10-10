@@ -12,6 +12,7 @@ use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Support\Facades\DB;
@@ -66,11 +67,201 @@ class ManageCatalogEditor extends Page implements HasTable
         $this->resetTable();
     }
 
+    /** Default item list for the selected page. */
     public function getTableQuery()
     {
         return $this->selectedPage
-            ? CatalogItem::query()->where('page_id', $this->selectedPage->id)
+            ? CatalogItem::query()
+                ->where('page_id', $this->selectedPage->id)
+                ->orderBy('order_number')
+                ->orderBy('catalog_name')
+                ->orderBy('id') // stable
             : CatalogItem::query()->whereRaw('1=0');
+    }
+
+    /** ===== Ordering helpers (Up/Down arrows) ===== */
+
+    protected function findPrevNeighbor(CatalogItem $record): ?CatalogItem
+    {
+        return CatalogItem::query()
+            ->where('page_id', $record->page_id)
+            ->where('order_number', '!=', -1)
+            ->where(function ($q) use ($record) {
+                $q->where('order_number', '<', $record->order_number)
+                  ->orWhere(function ($q2) use ($record) {
+                      $q2->where('order_number', $record->order_number)
+                         ->where('id', '<', $record->id);
+                  });
+            })
+            ->orderBy('order_number', 'desc')
+            ->orderBy('id', 'desc')
+            ->first();
+    }
+
+    protected function findNextNeighbor(CatalogItem $record): ?CatalogItem
+    {
+        return CatalogItem::query()
+            ->where('page_id', $record->page_id)
+            ->where('order_number', '!=', -1)
+            ->where(function ($q) use ($record) {
+                $q->where('order_number', '>', $record->order_number)
+                  ->orWhere(function ($q2) use ($record) {
+                      $q2->where('order_number', $record->order_number)
+                         ->where('id', '>', $record->id);
+                  });
+            })
+            ->orderBy('order_number', 'asc')
+            ->orderBy('id', 'asc')
+            ->first();
+    }
+
+    protected function canMoveUp(CatalogItem $record): bool
+    {
+        if ($record->order_number === -1) return false;
+        return (bool) $this->findPrevNeighbor($record);
+    }
+
+    protected function canMoveDown(CatalogItem $record): bool
+    {
+        if ($record->order_number === -1) return false;
+        return (bool) $this->findNextNeighbor($record);
+    }
+
+    protected function nudgeRecord(CatalogItem $record, string $direction): void
+    {
+        if ($record->order_number === -1) {
+            Notification::make()->title('Locked')->body('This item is locked (order = -1).')->danger()->send();
+            return;
+        }
+
+        $neighbor = $direction === 'up'
+            ? $this->findPrevNeighbor($record)
+            : $this->findNextNeighbor($record);
+
+        if (! $neighbor) {
+            return;
+        }
+
+        DB::transaction(function () use ($record, $neighbor) {
+            $a = $record->order_number;
+            $b = $neighbor->order_number;
+
+            $record->update(['order_number' => $b]);
+            $neighbor->update(['order_number' => $a]);
+        });
+
+        $this->normalizeOrderForSelectedPage();
+
+        Notification::make()->title('Order updated')->success()->send();
+    }
+	
+	protected function normalizeOrderForSelectedPage(): void
+{
+    if (! $this->selectedPage?->id) {
+        return;
+    }
+
+    // Re-number all non-locked items on this page to 10,20,30,... based on current order.
+    $items = CatalogItem::query()
+        ->where('page_id', $this->selectedPage->id)
+        ->where('order_number', '!=', -1)
+        ->orderBy('order_number')
+        ->orderBy('id')
+        ->get(['id']);
+
+    DB::transaction(function () use ($items) {
+        foreach ($items->values() as $index => $item) {
+            CatalogItem::whereKey($item->id)
+                ->update(['order_number' => ($index + 1) * 10]);
+        }
+    });
+
+    $this->resetTable();
+}
+
+    public function pageHasLockedItems(): bool
+    {
+        if (! $this->selectedPage?->id) {
+            return false;
+        }
+
+        return CatalogItem::query()
+            ->where('page_id', $this->selectedPage->id)
+            ->where('order_number', -1)
+            ->exists();
+    }
+
+    public function autoOrderItems(): void
+    {
+        if (! $this->selectedPage?->id) {
+            Notification::make()->title('Select a page first')->warning()->send();
+            return;
+        }
+
+        if ($this->pageHasLockedItems()) {
+            Notification::make()
+                ->title('Action not allowed')
+                ->body('This page contains item(s) with order_number = -1. Remove or change them before auto-ordering.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $affected = CatalogItem::query()
+            ->where('page_id', $this->selectedPage->id)
+            ->where('order_number', '!=', -1)
+            ->update(['order_number' => 99]);
+
+        $this->resetTable();
+
+        if ($affected > 0) {
+            Notification::make()->title('Items auto-ordered')->body("Updated {$affected} item(s).")->success()->send();
+        } else {
+            Notification::make()->title('Nothing to update')->body('No items were changed (none on this page or all are set to -1).')->warning()->send();
+        }
+    }
+
+    public function manualOrderItems(): void
+    {
+        if (! $this->selectedPage?->id) {
+            Notification::make()->title('Select a page first')->warning()->send();
+            return;
+        }
+
+        if ($this->pageHasLockedItems()) {
+            Notification::make()->title('Action not allowed')->body('This page contains item(s) with order_number = -1. Change/remove them before manual ordering.')->danger()->send();
+            return;
+        }
+
+        $items = CatalogItem::query()
+            ->where('page_id', $this->selectedPage->id)
+            ->where('order_number', '!=', -1)
+            ->orderBy('catalog_name', 'asc')
+            ->orderBy('id', 'asc')
+            ->get(['id']);
+
+        if ($items->isEmpty()) {
+            Notification::make()->title('Nothing to update')->body('No items on this page (or all are locked to -1).')->warning()->send();
+            return;
+        }
+
+        DB::transaction(function () use ($items) {
+            foreach ($items->values() as $index => $item) {
+                CatalogItem::whereKey($item->id)->update(['order_number' => ($index + 1) * 10]);
+            }
+        });
+
+        $this->resetTable();
+
+        Notification::make()->title('Items manually ordered')->body('Items sorted A→Z and numbered 10, 20, 30, …')->success()->send();
+    }
+
+    /** ===== Table definition ===== */
+
+    public function table(Table $table): Table
+    {
+        // No drag-reorder here anymore.
+        return $table->paginated(false);
     }
 
     protected function getTableColumns(): array
@@ -95,6 +286,7 @@ class ManageCatalogEditor extends Page implements HasTable
                     'name' => fn ($record) => $record->catalog_name,
                     'itemId' => fn ($record) => $record->id,
                     'isSelected' => fn ($record) => in_array($record->id, $this->selectedItemIds, true),
+                    // leave custom DnD as-is (still used to move to another page)
                 ])
                 ->sortable(false)
                 ->searchable(false),
@@ -103,167 +295,198 @@ class ManageCatalogEditor extends Page implements HasTable
             Tables\Columns\TextColumn::make('cost_points')->label('Points'),
             Tables\Columns\TextColumn::make('points_type')->label('Type'),
             Tables\Columns\TextColumn::make('amount')->label('Amount'),
+
+            Tables\Columns\TextColumn::make('order_number')
+                ->label('Order')
+                ->sortable()
+                ->toggleable(),
+
             Tables\Columns\IconColumn::make('club_only')->boolean()->label('Club Only'),
         ];
     }
 
     protected function getTableActions(): array
-    {
-        return [
-            EditAction::make('edit')
-                ->label('Edit')
-                ->icon('heroicon-m-pencil-square')
-                ->modalHeading('Edit catalog item')
-                ->modalSubmitActionLabel('Save')
-                ->modalWidth('md')
-                ->form([
-                    Forms\Components\TextInput::make('cost_credits')
-                        ->label('Credits')
-                        ->numeric()
-                        ->minValue(0)
-                        ->required(),
-
-                    Forms\Components\TextInput::make('cost_points')
-                        ->label('Points')
-                        ->numeric()
-                        ->minValue(0)
-                        ->required(),
-
-                    Forms\Components\TextInput::make('points_type')
-                        ->label('Type')
-                        ->numeric()
-                        ->minValue(0)
-						->maxValue(999)
-                        ->maxLength(50),
-
-                    Forms\Components\TextInput::make('amount')
-                        ->label('Amount')
-                        ->numeric()
-                        ->minValue(1)
-                        ->default(1)
-                        ->required(),
-
-                    Forms\Components\Toggle::make('club_only')
-                        ->label('Club only'),
-                ])
-                ->fillForm(fn (CatalogItem $record) => [
-                    'cost_credits' => $record->cost_credits,
-                    'cost_points' => $record->cost_points,
-                    'points_type' => $record->points_type,
-                    'amount' => $record->amount,
-                    'club_only'    => $record->club_only === '1',
-                ])
-                ->action(function (CatalogItem $record, array $data): void {
-                    $record->update([
-                        'cost_credits' => (int) $data['cost_credits'],
-                        'cost_points' => (int) $data['cost_points'],
-                        'points_type' => $data['points_type'] ?? null,
-                        'amount' => (int) $data['amount'],
-                        'club_only'    => !empty($data['club_only']) ? '1' : '0',
-                    ]);
-
-                    $this->resetTable();
-
-                    Notification::make()
-                        ->title('Item updated')
-                        ->success()
-                        ->send();
-                }),
-        ];
-    }
-	
-	
-	protected function getActions(): array
 {
     return [
-        FilamentAction::make('editPage')
-            ->label('Edit page')
-            ->modalHeading(function (array $arguments): string {
-                $page = CatalogPage::find($arguments['pageId'] ?? null);
-                return $page ? ('Edit: ' . $page->caption) : 'Edit page';
-            })
+        // Up / Down movers
+        FilamentAction::make('move_up')
+            ->label('')
+            ->icon('heroicon-m-chevron-up')
+            ->color('gray')
+            ->tooltip('Move up')
+            ->action(fn (\App\Models\Game\Furniture\CatalogItem $record) => $this->nudgeRecord($record, 'up'))
+            ->visible(fn (\App\Models\Game\Furniture\CatalogItem $record) => $this->canMoveUp($record))
+            ->size('sm'),
+
+        FilamentAction::make('move_down')
+            ->label('')
+            ->icon('heroicon-m-chevron-down')
+            ->color('gray')
+            ->tooltip('Move down')
+            ->action(fn (\App\Models\Game\Furniture\CatalogItem $record) => $this->nudgeRecord($record, 'down'))
+            ->visible(fn (\App\Models\Game\Furniture\CatalogItem $record) => $this->canMoveDown($record))
+            ->size('sm'),
+
+        // Existing Edit action (this was already working in your v4 setup)
+        EditAction::make('edit')
+            ->label('Edit')
+            ->icon('heroicon-m-pencil-square')
+            ->modalHeading('Edit catalog item')
             ->modalSubmitActionLabel('Save')
             ->modalWidth('md')
             ->form([
-                Forms\Components\TextInput::make('caption')
-                    ->label('Name')
-                    ->maxLength(128)
+                Forms\Components\TextInput::make('cost_credits')->label('Credits')->numeric()->minValue(0)->required(),
+                Forms\Components\TextInput::make('cost_points')->label('Points')->numeric()->minValue(0)->required(),
+                Forms\Components\TextInput::make('points_type')->label('Type')->numeric()->minValue(0)->maxValue(999)->maxLength(50),
+                Forms\Components\TextInput::make('amount')->label('Amount')->numeric()->minValue(1)->default(1)->required(),
+                Forms\Components\TextInput::make('order_number')
+                    ->label('Order')
+                    ->numeric()
+                    ->minValue(-1)
+                    ->step(1)
+                    ->helperText('Use -1 to lock, or a non-negative number to sort (lower = earlier).')
                     ->required(),
-
-                Forms\Components\TextInput::make('caption_save')
-                    ->label('Name TAG')
-                    ->maxLength(25)
-                    ->nullable()
-                    // client-side hint
-                    ->extraInputAttributes([
-                        'pattern' => '[a-z]*',
-                        'title' => 'Lowercase letters only (a–z), no spaces. Leave empty if you want.',
-                        'inputmode' => 'latin',
-                        'spellcheck' => 'false',
-                        'autocomplete' => 'off',
-                    ])
-                    // normalize to lowercase, strip invalid chars on the fly
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($state === null || $state === '') {
-                            $set('caption_save', '');
-                            return;
-                        }
-                        // keep only a–z and lowercase
-                        $normalized = strtolower(preg_replace('/[^a-z]/', '', $state));
-                        $set('caption_save', $normalized);
-                    })
-                    // server validation (optional but strict)
-                    ->rule('nullable|regex:/^[a-z]+$/')
-                    ->validationMessages([
-                        'regex' => 'Use lowercase letters only (a–z), no spaces or special characters.',
-                    ])
-                    ->helperText('Optional. Lowercase letters only (a–z). No spaces or special characters.'),
+                Forms\Components\Toggle::make('club_only')->label('Club only'),
             ])
-            // Prefill both fields
-            ->fillForm(function (array $arguments): array {
-                $pageId = $arguments['pageId'] ?? null;
-                $page = $pageId ? CatalogPage::find($pageId) : null;
-
-                return [
-                    'caption'      => $page?->caption ?? '',
-                    'caption_save' => $page?->caption_save ?? '',
-                ];
-            })
-            // Save both fields
-            ->action(function (array $data, array $arguments): void {
-                $pageId = $arguments['pageId'] ?? null;
-                $page = $pageId ? CatalogPage::find($pageId) : null;
-
-                if (! $page) {
-                    Notification::make()->title('Page not found')->danger()->send();
-                    return;
-                }
-
-                // Final server-side normalization for safety
-                $tag = $data['caption_save'] ?? '';
-                if ($tag !== '') {
-                    $tag = strtolower(preg_replace('/[^a-z]/', '', $tag));
-                }
-
-                $page->update([
-                    'caption'      => $data['caption'],
-                    'caption_save' => $tag,   // empty string allowed
+            ->fillForm(fn (\App\Models\Game\Furniture\CatalogItem $record) => [
+                'cost_credits' => $record->cost_credits,
+                'cost_points' => $record->cost_points,
+                'points_type' => $record->points_type,
+                'amount' => $record->amount,
+                'order_number' => $record->order_number,
+                'club_only' => $record->club_only === '1',
+            ])
+            ->action(function (\App\Models\Game\Furniture\CatalogItem $record, array $data): void {
+                $record->update([
+                    'cost_credits'  => (int) $data['cost_credits'],
+                    'cost_points'   => (int) $data['cost_points'],
+                    'points_type'   => $data['points_type'] ?? null,
+                    'amount'        => (int) $data['amount'],
+                    'order_number'  => (int) $data['order_number'],
+                    'club_only'     => ! empty($data['club_only']) ? '1' : '0',
                 ]);
 
-                $this->selectPage($page->id);
+                $this->resetTable();
 
-                Notification::make()->title('Page updated')->success()->send();
+                Notification::make()->title('Item updated')->success()->send();
             }),
     ];
 }
 
 
-	public function openEditPage(int $pageId): void
-{
-    $this->mountAction('editPage', ['pageId' => $pageId]);
-}
+    protected function getActions(): array
+    {
+        return [
+            FilamentAction::make('editPage')
+                ->label('Edit page')
+                ->modalHeading(function (array $arguments): string {
+                    $page = CatalogPage::find($arguments['pageId'] ?? null);
+                    return $page ? 'Edit: ' . $page->caption : 'Edit page';
+                })
+                ->modalSubmitActionLabel('Save')
+                ->modalWidth('3xl')
+                ->form([
+                    Forms\Components\TextInput::make('caption')->label('Name')->maxLength(128)->required(),
 
+                    Forms\Components\TextInput::make('caption_save')
+                        ->label('Name TAG')
+                        ->maxLength(25)
+                        ->nullable()
+                        ->extraInputAttributes([
+                            'pattern' => '[a-z]*',
+                            'title' => 'Lowercase letters only (a–z); leave empty if you want.',
+                            'spellcheck' => 'false',
+                            'autocomplete' => 'off',
+                        ])
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function ($state, callable $set) {
+                            if ($state === null || $state === '') {
+                                $set('caption_save', '');
+                                return;
+                            }
+                            $set('caption_save', strtolower(preg_replace('/[^a-z]/', '', $state)));
+                        })
+                        ->rules(['nullable', 'regex:/^[a-z]+$/'])
+                        ->validationMessages([
+                            'regex' => 'Use lowercase letters only (a–z), no spaces or special characters.',
+                        ]),
+
+                    Forms\Components\TextInput::make('order_num')
+                        ->label('Order')
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(1)
+                        ->required()
+                        ->helperText('Lower number appears earlier in the menu.'),
+
+                    Forms\Components\TextInput::make('icon_image')
+                        ->label('Icon number')
+                        ->numeric()
+                        ->minValue(1)
+                        ->required()
+                        ->default(1)
+                        ->live()
+                        ->helperText(function ($get) {
+                            $id = (int) ($get('icon_image') ?: 1);
+                            $url = $this->buildCatalogIconUrl($id);
+                            $fallback = $this->buildCatalogIconUrl(1);
+
+                            $html = '<div class="mt-2 flex items-center gap-3">
+                                <img src="' . e($url) . '" alt="icon ' . e($id) . '" class="h-8 w-8 object-contain"
+                                    loading="lazy"
+                                    onerror="this.onerror=null;this.src=\'' . e($fallback) . '\'"
+                                    style="image-rendering: pixelated; image-rendering: crisp-edges;">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">Icon #' . e($id) . '</span>
+                            </div>';
+
+                            return new \Illuminate\Support\HtmlString($html);
+                        }),
+                ])
+                ->fillForm(function (array $arguments): array {
+                    $page = CatalogPage::find($arguments['pageId'] ?? null);
+
+                    return [
+                        'caption'      => $page?->caption ?? '',
+                        'caption_save' => $page?->caption_save ?? '',
+                        'order_num'    => $page?->order_num ?? 1,
+                        'icon_image'   => $page?->icon_image ?? 1,
+                    ];
+                })
+                ->action(function (array $data, array $arguments): void {
+                    $page = CatalogPage::find($arguments['pageId'] ?? null);
+
+                    if (! $page) {
+                        Notification::make()->title('Page not found')->danger()->send();
+                        return;
+                    }
+
+                    $tag = $data['caption_save'] ?? '';
+                    if ($tag !== '') {
+                        $tag = strtolower(preg_replace('/[^a-z]/', '', $tag));
+                    }
+
+                    $icon = max(1, (int) ($data['icon_image'] ?: 1));
+
+                    $page->update([
+                        'caption'      => $data['caption'],
+                        'caption_save' => $tag,
+                        'order_num'    => (int) ($data['order_num'] ?? 1),
+                        'icon_image'   => $icon,
+                    ]);
+
+                    $this->selectPage($page->id);
+
+                    Notification::make()->title('Page updated')->success()->send();
+                }),
+        ];
+    }
+
+    public function openEditPage(int $pageId): void
+    {
+        $this->mountAction('editPage', ['pageId' => $pageId]);
+    }
+
+    /** ===== Move items between pages (via drag into tree) ===== */
 
     public function moveItemToPage(int $itemId, int $targetPageId): void
     {
@@ -282,20 +505,16 @@ class ManageCatalogEditor extends Page implements HasTable
         $target = CatalogPage::find($targetPageId);
 
         if (empty($ids) || ! $target) {
-            Notification::make()
-                ->title('Move failed')
-                ->body('No items selected or target page not found.')
-                ->danger()
-                ->send();
-
+            Notification::make()->title('Move failed')->body('No items selected or target page not found.')->danger()->send();
             return;
         }
 
         DB::transaction(function () use ($ids, $targetPageId) {
             $maxOrder = (int) (CatalogItem::where('page_id', $targetPageId)->max('order_number') ?? 0);
+
             foreach ($ids as $i => $id) {
                 CatalogItem::whereKey($id)->update([
-                    'page_id' => $targetPageId,
+                    'page_id'      => $targetPageId,
                     'order_number' => $maxOrder + 1 + $i,
                 ]);
             }
@@ -306,16 +525,18 @@ class ManageCatalogEditor extends Page implements HasTable
 
         Notification::make()
             ->title('Items moved')
-            ->body('Moved '.count($ids).' item(s) to: '.($target->caption ?? ('#'.$targetPageId)))
+            ->body('Moved ' . count($ids) . ' item(s) to: ' . ($target->caption ?? ('#' . $targetPageId)))
             ->success()
             ->send();
     }
+
+    /** ===== Icon helpers ===== */
 
     protected function buildFurniIconUrl(string $catalogName): string
     {
         $base = $this->getFurniIconBasePath();
         $safeName = str_replace('*', '_', $catalogName);
-        $path = rtrim($base, '/').'/'.$safeName.'_icon.png';
+        $path = rtrim($base, '/') . '/' . $safeName . '_icon.png';
 
         if (preg_match('#^(https?:)?//#', $path)) {
             return $path;
@@ -342,7 +563,7 @@ class ManageCatalogEditor extends Page implements HasTable
     {
         $iconImage = $iconImage > 0 ? $iconImage : 1;
         $base = $this->getCatalogIconBasePath();
-        $path = $base.'/icon_'.$iconImage.'.png';
+        $path = $base . '/icon_' . $iconImage . '.png';
 
         if (preg_match('#^(https?:)?//#', $path)) {
             return $path;
@@ -350,6 +571,8 @@ class ManageCatalogEditor extends Page implements HasTable
 
         return asset($path);
     }
+
+    /** ===== Mass edit header action ===== */
 
     protected function getTableHeaderActions(): array
     {
@@ -363,42 +586,14 @@ class ManageCatalogEditor extends Page implements HasTable
                 ->modalSubmitActionLabel('Apply changes')
                 ->modalWidth('lg')
                 ->form([
-                    Forms\Components\TextInput::make('cost_credits')
-                        ->label('Credits')
-                        ->numeric()
-                        ->minValue(0)
-                        ->nullable()
-                        ->helperText('Leave empty to keep unchanged'),
-
-                    Forms\Components\TextInput::make('cost_points')
-                        ->label('Points')
-                        ->numeric()
-                        ->minValue(0)
-                        ->nullable()
-                        ->helperText('Leave empty to keep unchanged'),
-
-                    Forms\Components\TextInput::make('points_type')
-                        ->label('Type (points_type)')
-                        ->numeric()
-                        ->minValue(0)
-                        ->maxValue(999)
-                        ->nullable()
-                        ->helperText('Leave empty to keep unchanged'),
-
-                    Forms\Components\TextInput::make('amount')
-                        ->label('Amount')
-                        ->numeric()
-                        ->minValue(1)
-                        ->nullable()
-                        ->helperText('Leave empty to keep unchanged'),
-
+                    Forms\Components\TextInput::make('cost_credits')->label('Credits')->numeric()->minValue(0)->nullable()->helperText('Leave empty to keep unchanged'),
+                    Forms\Components\TextInput::make('cost_points')->label('Points')->numeric()->minValue(0)->nullable()->helperText('Leave empty to keep unchanged'),
+                    Forms\Components\TextInput::make('points_type')->label('Type (points_type)')->numeric()->minValue(0)->maxValue(999)->nullable()->helperText('Leave empty to keep unchanged'),
+                    Forms\Components\TextInput::make('amount')->label('Amount')->numeric()->minValue(1)->nullable()->helperText('Leave empty to keep unchanged'),
+                    Forms\Components\TextInput::make('order_number')->label('Order')->numeric()->minValue(-1)->nullable()->helperText('Leave empty to keep unchanged'),
                     Forms\Components\Select::make('club_only')
                         ->label('Club only')
-                        ->options([
-                            '' => '— No change —',
-                            '1' => 'Yes',
-                            '0' => 'No',
-                        ])
+                        ->options(['' => '— No change —', '1' => 'Yes', '0' => 'No'])
                         ->native(false)
                         ->nullable()
                         ->default('')
@@ -412,11 +607,7 @@ class ManageCatalogEditor extends Page implements HasTable
                         ->all();
 
                     if (empty($ids)) {
-                        Notification::make()
-                            ->title('No items selected')
-                            ->warning()
-                            ->send();
-
+                        Notification::make()->title('No items selected')->warning()->send();
                         return;
                     }
 
@@ -434,17 +625,15 @@ class ManageCatalogEditor extends Page implements HasTable
                     if ($data['amount'] !== null && $data['amount'] !== '') {
                         $updates['amount'] = (int) $data['amount'];
                     }
+                    if ($data['order_number'] !== null && $data['order_number'] !== '') {
+                        $updates['order_number'] = (int) $data['order_number'];
+                    }
                     if ($data['club_only'] !== null && $data['club_only'] !== '') {
                         $updates['club_only'] = $data['club_only'] === '1' ? '1' : '0';
                     }
 
                     if (empty($updates)) {
-                        Notification::make()
-                            ->title('Nothing to update')
-                            ->body('Fill at least one field to apply to the selected items.')
-                            ->warning()
-                            ->send();
-
+                        Notification::make()->title('Nothing to update')->body('Fill at least one field to apply to the selected items.')->warning()->send();
                         return;
                     }
 
@@ -454,11 +643,7 @@ class ManageCatalogEditor extends Page implements HasTable
                     $this->resetTable();
                     $this->selectedItemIds = [];
 
-                    Notification::make()
-                        ->title('Updated items')
-                        ->body("Applied changes to {$count} item(s).")
-                        ->success()
-                        ->send();
+                    Notification::make()->title('Updated items')->body("Applied changes to {$count} item(s).")->success()->send();
                 }),
         ];
     }

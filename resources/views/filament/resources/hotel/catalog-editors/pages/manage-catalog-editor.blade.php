@@ -52,13 +52,48 @@
                 class="dark:bg-gray-900 dark:border-gray-700"
             >
                 <div style="padding:0.75rem; border-bottom:1px solid var(--gray-200);" class="dark:border-gray-700">
-                    <h2 class="font-semibold text-lg m-0">
-                        @if($selectedPage)
-                            Items for: <span class="text-primary-600">{{ $selectedPage->caption }}</span>
-                        @else
-                            Select a catalog page to view its items
+                    <div class="flex items-center justify-between gap-2">
+                        <h2 class="font-semibold text-lg m-0">
+                            @if($selectedPage)
+                                Items for: <span class="text-primary-600">{{ $selectedPage->caption }}</span>
+                            @else
+                                Select a catalog page to view its items
+                            @endif
+                        </h2>
+
+                        {{-- Action buttons: only when a non-root page is selected AND it has no -1 items --}}
+                        @if($selectedPage && $selectedPage->parent_id !== -1 && ! $this->pageHasLockedItems())
+                            <div class="flex items-center gap-2">
+                                <x-filament::button
+                                    wire:click="autoOrderItems"
+                                    icon="heroicon-m-arrow-path"
+                                >
+                                    Auto Order Items
+                                </x-filament::button>
+
+                                <x-filament::button
+                                    wire:click="manualOrderItems"
+                                    icon="heroicon-m-arrow-up-on-square-stack"
+                                    color="secondary"
+                                >
+                                    Manual Order
+                                </x-filament::button>
+                            </div>
                         @endif
-                    </h2>
+                    </div>
+
+                    {{-- Hints when hidden --}}
+                    @if($selectedPage && $selectedPage->parent_id === -1)
+                        <p class="mt-2 text-xs text-gray-500">
+                            This is a root menu entry. Select a subpage to order its items.
+                        </p>
+                    @elseif($selectedPage && $this->pageHasLockedItems())
+                        <p class="mt-2 text-xs text-gray-500">
+                            This page contains item(s) with
+                            <code class="px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800">order_number = -1</code>.
+                            Change or remove them to enable ordering.
+                        </p>
+                    @endif
                 </div>
 
                 <div style="flex:1 1 auto; min-height:0; overflow:auto; padding:0.75rem;">
