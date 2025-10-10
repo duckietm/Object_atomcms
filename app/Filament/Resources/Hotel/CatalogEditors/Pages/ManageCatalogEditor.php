@@ -171,6 +171,99 @@ class ManageCatalogEditor extends Page implements HasTable
                 }),
         ];
     }
+	
+	
+	protected function getActions(): array
+{
+    return [
+        FilamentAction::make('editPage')
+            ->label('Edit page')
+            ->modalHeading(function (array $arguments): string {
+                $page = CatalogPage::find($arguments['pageId'] ?? null);
+                return $page ? ('Edit: ' . $page->caption) : 'Edit page';
+            })
+            ->modalSubmitActionLabel('Save')
+            ->modalWidth('md')
+            ->form([
+                Forms\Components\TextInput::make('caption')
+                    ->label('Name')
+                    ->maxLength(128)
+                    ->required(),
+
+                Forms\Components\TextInput::make('caption_save')
+                    ->label('Name TAG')
+                    ->maxLength(25)
+                    ->nullable()
+                    // client-side hint
+                    ->extraInputAttributes([
+                        'pattern' => '[a-z]*',
+                        'title' => 'Lowercase letters only (a–z), no spaces. Leave empty if you want.',
+                        'inputmode' => 'latin',
+                        'spellcheck' => 'false',
+                        'autocomplete' => 'off',
+                    ])
+                    // normalize to lowercase, strip invalid chars on the fly
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state === null || $state === '') {
+                            $set('caption_save', '');
+                            return;
+                        }
+                        // keep only a–z and lowercase
+                        $normalized = strtolower(preg_replace('/[^a-z]/', '', $state));
+                        $set('caption_save', $normalized);
+                    })
+                    // server validation (optional but strict)
+                    ->rule('nullable|regex:/^[a-z]+$/')
+                    ->validationMessages([
+                        'regex' => 'Use lowercase letters only (a–z), no spaces or special characters.',
+                    ])
+                    ->helperText('Optional. Lowercase letters only (a–z). No spaces or special characters.'),
+            ])
+            // Prefill both fields
+            ->fillForm(function (array $arguments): array {
+                $pageId = $arguments['pageId'] ?? null;
+                $page = $pageId ? CatalogPage::find($pageId) : null;
+
+                return [
+                    'caption'      => $page?->caption ?? '',
+                    'caption_save' => $page?->caption_save ?? '',
+                ];
+            })
+            // Save both fields
+            ->action(function (array $data, array $arguments): void {
+                $pageId = $arguments['pageId'] ?? null;
+                $page = $pageId ? CatalogPage::find($pageId) : null;
+
+                if (! $page) {
+                    Notification::make()->title('Page not found')->danger()->send();
+                    return;
+                }
+
+                // Final server-side normalization for safety
+                $tag = $data['caption_save'] ?? '';
+                if ($tag !== '') {
+                    $tag = strtolower(preg_replace('/[^a-z]/', '', $tag));
+                }
+
+                $page->update([
+                    'caption'      => $data['caption'],
+                    'caption_save' => $tag,   // empty string allowed
+                ]);
+
+                $this->selectPage($page->id);
+
+                Notification::make()->title('Page updated')->success()->send();
+            }),
+    ];
+}
+
+
+	public function openEditPage(int $pageId): void
+{
+    $this->mountAction('editPage', ['pageId' => $pageId]);
+}
+
 
     public function moveItemToPage(int $itemId, int $targetPageId): void
     {
@@ -355,7 +448,7 @@ class ManageCatalogEditor extends Page implements HasTable
                         return;
                     }
 
-                    \App\Models\Game\Furniture\CatalogItem::whereIn('id', $ids)->update($updates);
+                    CatalogItem::whereIn('id', $ids)->update($updates);
 
                     $count = count($ids);
                     $this->resetTable();
